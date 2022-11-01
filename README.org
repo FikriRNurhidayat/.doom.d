@@ -1,0 +1,237 @@
+#+title: Konfigurasi Emacs
+#+author: Fikri Rahmat Nurhidayat
+#+property: header-args :tangle ./config.bak.el
+
+Ketika benda yang kau miliki, berakhir memilikimu.
+
+* Prakata
+
+/Editor/ bagi seorang programmer itu sangat krusial. Maka dari itu kenyamanan dalam menggunakan /editor/ berbanding lurus dengan produktifitas programmer.
+
+
+#+name: Kenyamanan Editor
+#+attr_html: :width 50%
+[[~/Documents/attachments/fikrirnurhidayat-emacs-kenyamanan-editor.png]]
+
+Untuk masalah kenyamanan dalam menggunakan /editor/ itu sangatlah relatif, ada orang yang memilih menggunakan /Visual Studio Code/, ada orang yang cinta mati dengan produk Jetbrains, dan ada orang-orang masokis seperti saya yang suka menggunakan /Vim/.
+
+** Lantas kenapa emacs?
+
+Pertanyaan ini sering muncul di kalangan rekan kerja saya yang selalu meledek /editor/ yang saya pakai. Namun saya tidak menyalahkan mereka juga karena emacs sendiri membutuhkan waktu untuk sesuai dengan kebutuhan sehari-hari saya sebagai seorang programmer.
+
+Sebelum saya menjawab kenapa saya memilih /emacs/ sebagai /editor/-ku, mari kita bahas sedikit kenapa orang lain memilih /editor/ lain.
+
+Orang memilih menggunakan /Visual Studio Code/ karena:
+- Terdapat banyak ekstensi yang dapat diinstal yang mempermudah kebutuhan sehari-hari. Sebagai contoh, /Live Sharing/, /Live Server/, /Markdown Preview/, dsb.
+- Antarmuka pengguna yang sangat mudah dipahami.
+- Tidak berat untuk dijalankan di komputer.
+- Ada /autocompletion/.
+- /Context aware/ dengan kode yang sedang kita kerjakan.
+
+Orang memilih menggunakan produk /Jetbrains/ karena:
+- Antarmuka pengguna yang sangat mudah dipahami.
+- Banyak alat-alat canggih yang membantu proses pemrograman, seperti /Refactor/ dan sebagainya.
+- Ada /autocompletion/.
+- /Context aware/ dengan kode yang sedang kita kerjakan.
+
+Dari dua opsi itu, bisa disimpulkan bahwa, kebanyakan programmer itu senang dengan kemudahan dalam menulis kode. Semua hal yang disebut sebagai alasan mengapa menggunakan kedua /editor/ itu sebenarnya ada juga di dalam emacs.
+
+*** Kehadiran LSP merubah segalanya
+
+Terimakasih ke VSCode, yang mana tim VSCode membuat protokol yang mendefinisikan bagaimana /tools/ dapat berkomunikasi dengan /editor/ supaya dapat menunjang proses pemrograman dan penulisan kode. Protokol ini dinamakan dengan *Language Server Protocol* atau biasa disebut dengan singkatannya yaitu *LSP*.
+
+Di era modern ini, setiap bahasa pemrograman pasti akan mempunyai /tools/ penunjangnya, yang secara resmi didukung oleh pengembang bahasa itu sendiri. /Tools/ ini disebut dengan *Language Server*. Nah, /editor/ akan menjadi klien dari si *Language Server*.
+
+Setelah LSP ini diadopsi secara masal, neovim dan emacs akhirnya mengimplementasikan protokol ini juga. Jadi sebagai pengguna emacs kita tidak perlu khawatir akan tertinggal dengan /editor/ lainnya, karena kita sama-sama terekspos dengan /tools/ yang sama.
+
+*** Kaya akan ekstensi
+
+Emacs sudah berumur lebih dari 30 tahun, dan konfigurasi /emacs/ ditulis dengan menggunakan /emacs lisp (elisp)/. Pastinya, sudah banyak sekali orang yang berkontribusi untuk membentuk emacs, dari generasi kakek saya, sampai ke generasi saya.
+
+*** Ekstensibel
+
+Karena konfigurasi emacs ditulis menggunakan /emacs lisp (elisp)/, bahasa pemrograman yang menurutku sederhana dan hebat, memodifikasi fitur, atau menambahkan fitur baru di emacs sangatlah mudah dan menyenangkan. Dan juga kita tidak perlu /toolchain/ seperti yang digunakan VSCode untuk membuat ekstensi.
+
+*** ORG mode
+
+=org-mode= adalah mode minor yang ada di emacs, yang mana berfungsi untuk melsayakan manajemen berkas =.org=. Org mode ini canggih sekali, kita bisa melsayakan manajemen tugas, menulis dokumen, melsayakan pemrograman literasi, dan banyak hal lain. Bahkan, dokumen ini ditulis menggunakan =org-mode= yang mana juga berfungsi sebagai sumber kode dari konfigurasi /emacs/-ku.
+
+** Tentang dokumen ini
+
+Dokumen ini akan berisi konfigurasi /emacs/ pribadi saya yang saya bentuk dari waktu ke waktu. Jadi dokumen ini akan selalu dirubah dari waktu ke waktu.
+
+* Konfigurasi Sederhana?
+
+Saya tidak tau kenapa ini dan bagaimana kode di bawah ini akan mempercepat eksekusi kode pada berkas ini, mungkin saya akan membaca [[https://nullprogram.com/blog/2016/12/22/][blog ini]] dan menuliskannya disini alasannya.
+
+#+begin_src elisp
+;;; config.el -*- lexical-binding: t; -*-
+#+end_src
+
+** Informasi Personal
+
+Kita perlu memberi tahu emacs tentang informasi personal kita seperti email dan nama lengkap kita. Ini akan membantu di beberapa tempat, salah satunya adalah manajemen berkas org.
+
+#+begin_src elisp
+(setq user-full-name "Fikri Rahmat Nurhidayat"
+      user-mail-address "fikrirnurhidayat@gmail.com")
+#+end_src
+
+** Apakah cantik itu penting?
+
+Yak, sebagus apapun GUI, kalo skema warna tidak sesuai ya sama aja.
+
+#+begin_src elisp
+(setq doom-theme 'doom-nord)
+#+end_src
+
+*** Fonts
+
+Saya suka menggunakan font =Iosevka=, karena bentuknya tidak terlalu lebay dan sederhana saja.
+
+#+begin_src elisp
+(setq doom-font (font-spec :family "Iosevka Term" :size 16)
+      doom-big-font (font-spec :family "Iosevka Term" :size 24)
+      doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 16 :weight 'light)
+      doom-unicode-font (font-spec :family "JuliaMono")
+      doom-serif-font (font-spec :family "Iosevka Etoile"))
+#+end_src
+
+Dan juga, biar beberapa simbol terlihat lebih mencolok, kita rubah /font/-nya menjadi /italic/.
+
+#+begin_src elisp
+(custom-set-faces!
+  '(font-lock-comment-face :slant italic)
+  '(font-lock-keyword-face :slant italic))
+#+end_src
+
+*** Line Numbers
+
+Karena kita menggunakan =evil-mode=, maka sudah menjadi suatu keharusan kalau kita menampilkan nomor baris menggunakan mode relatif.
+
+#+begin_src elisp
+(setq display-line-numbers-type 'relative)
+#+end_src
+
+** ORG Mode
+
+Potensi dari =org-mode= ini sangat besar, saya bisa mencatat apa yang perlu saya lakukan, apa yang akan saya lakukan, dan menulis dokumen ini sebagai konfigurasi emacs saya.
+
+*** Konfigurasi Dasar
+
+#+begin_src elisp
+(setq org-directory "~/Documents/org/"            ; tempat penyimpanan berkas-berkas dari org
+      org-roam-directory "~/Documents/roams/"     ; tempat penyimpanan berkas-berkas dari org roam
+      org-clock-sound "~/Documents/bababooey.wav" ; suara notifikasi bababooey
+      truncate-string-ellipsis "…"                ; pengganti elipsis
+      org-ellipsis " ▾ "                          ; string elipsis yang ditampilkan ketika suatu bagian dilipat
+      org-use-property-inheritance t              ; mewarisi properti dari tajuk yang lebih tinggi
+      org-log-done 'time                          ; mencatat kapan suatu item selesai
+      org-list-allow-alphabetical t               ; menggunakan alfabet sebagai prefiks di masing-masing item di dalam daftar
+      org-export-in-background t                  ; mengekspor tanpa mengganggu pekerjaan lain
+      org-hide-emphasis-markers t                 ; menyembunyikan emphasis di dalam berkas org
+      org-fold-catch-invisible-edits 'smart)      ; berhati-hati ketika ada benda yang tidak terlihat
+#+end_src
+
+*** Penampilan
+
+Tampilan bawaan ORG Mode itu tidak terlalu menarik menurut saya. Jadi, kita coba solek tampilan si ORG Mode ini dengan beberapa hal.
+
+**** Membuat titik tajuk menjadi lebih menarik
+
+Di dalam org mode, kita menggunakan bintang "*" sebagai penanda tajuk. Cukup membosankan kalau hanya menggunakan bintang, maka dari itu saya menginstal =org-superstar= untuk merubah titik tajuk dari bintang menjadi titik saja.
+
+#+begin_src elisp
+(use-package! org-superstar
+  :config
+  (setq org-superstar-headline-bullets-list '("•")))
+#+end_src
+
+**** Menyembunyikan Emphasis Marker
+
+ORG Mode akan sangat ramai kalau /emphasis marker/ tidak disembunyikan dari tampilan. Saya menonaktifkan /emphasis marker/ dari tampilan agar telihat lebih bersih. Namun ada kendala lain, jika saya ingin merubah teks yang di dalamnya terdapat /emphasis marker/, maka saya tidak akan pernah tau karena tampilannya sama sekali tidak memberikan tanda-tanda bahwa disitu ada /emphasis marker/.
+
+Maka dari itu, saya menginstal =org-appear=. /Package/ ini bertugas untuk menampilkan /emphasis marker/ apabila kursor saya berada di dalam teks yang memiliki /emphasis marker/.
+
+#+begin_src elisp
+(use-package! org-appear
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autoemphasis t
+        org-appear-autosubmarkers t
+        org-appear-autolinks nil)
+  (setq-local display-line-numbers-mode nil)
+  ;; biar keliatan dari awal, `org-appear--set-elements'
+  ;; perlu dijalanin setelah hook lain udah dijalanin.
+  (run-at-time nil nil #'org-appear--set-elements))
+#+end_src
+
+*** Presentasi
+
+Saya bisa terlihat keren di depan rekan kerja saya karena ketika saya presentasi saya menggunakan emacs.
+
+Untuk pengaturan presentasi saya di dalam emacs, saya mengikuti tutorial dari [[https://www.youtube.com/watch?v=SCPoF1PTZpI][SystemCrafters]].
+
+#+begin_src elisp
+(use-package! org-present
+  :bind (:map org-present-mode-keymap
+         ("C-c C-j" . org-present-next)
+         ("C-c C-k" . org-present-prev))
+  :hook ((org-present-mode . +org-present-hook)
+         (org-present-mode-quit . +org-present-quit-hook))
+  :init
+    (add-hook 'org-present-after-navigate-functions '+org-present-prepare-slide))
+#+end_src
+
+Lalu, sama seperti pernyataan sebelumnya, saya juga menyalin =+org-present-hook= dari SystemCrafters juga. Disini saya mengatur ukuran font, menyembunyikan /line numbers/, menyembunyikan /mode-line/, dan menampilkan gambar jika ada di dalam presentasi.
+
+#+begin_src elisp
+(defun +org-present-hook ()
+  (setq-local visual-fill-column-width 192
+      visual-fill-column-center-text t)
+
+  (setq-local face-remapping-alist '((default (:height 2.0) variable-pitch)
+                                     (header-line (:height 4.0) variable-pitch)
+                                     (org-document-title (:height 2.0) org-document-title)
+                                     (org-table (:height 0.5 :family "Iosevka") org-table)
+                                     (org-code (:height 1.0 :family "Iosevka") org-code)
+                                     (org-verbatim (:height 1.0 :family "Iosevka") org-verbatim)
+                                     (org-block (:height 1.0 :family "Iosevka") org-block)
+                                     (org-block-begin-line (:height 0.7) org-block-begin-line)
+                                     (org-block-end-line (:height 0.7) org-block-end-line)))
+  (display-line-numbers-mode 0)
+  (setq header-line-format " ")
+  (visual-fill-column-mode 1)
+  (visual-line-mode 1)
+  (hide-mode-line-mode 1)
+  (org-display-inline-images))
+#+end_src
+
+Dan juga, karena saya melakukan perubahan terhadap buffer yang digunakan untuk presentasi, mulai dari ukuran font, dan sebagainya, maka saya perlu mengembalikannya seperti semula. Seperti sebelum mode presentasi diaktifkan.
+
+#+begin_src elisp
+(defun +org-present-quit-hook ()
+  (setq-local face-remapping-alist '((default variable-pitch default)))
+  (setq header-line-format nil)
+  (org-present-small)
+  (visual-fill-column-mode 0)
+  (org-indent-mode 1)
+  (hide-mode-line-mode 0)
+  (org-superstar-restart)
+  (org-mode-restart)
+  (org-remove-inline-images))
+#+end_src
+
+Terakhir, ketika melakukan perpindahan /slide/, alangkah baiknya jika setiap /slide/ dilipat dan hanya memperlihatkan garis besarnya saja.
+
+#+begin_src elisp
+(defun +org-present-prepare-slide (buffer-name heading)
+  ;; Show only top-level headlines
+  (org-overview)
+
+  ;; Unfold the current entry
+  (org-fold-show-entry)
+
+  ;; Show only direct subheadings of the slide but don't expand them
+  (org-fold-show-children))
+#+end_src
