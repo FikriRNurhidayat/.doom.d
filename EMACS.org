@@ -8,11 +8,6 @@ Ketika benda yang kau miliki, berakhir memilikimu.
 
 /Editor/ bagi seorang programmer itu sangat krusial. Maka dari itu kenyamanan dalam menggunakan /editor/ berbanding lurus dengan produktifitas programmer.
 
-
-#+name: Kenyamanan Editor
-#+attr_html: :width 50%
-[[~/Documents/attachments/fikrirnurhidayat-emacs-kenyamanan-editor.png]]
-
 Untuk masalah kenyamanan dalam menggunakan /editor/ itu sangatlah relatif, ada orang yang memilih menggunakan /Visual Studio Code/, ada orang yang cinta mati dengan produk Jetbrains, dan ada orang-orang masokis seperti saya yang suka menggunakan /Vim/.
 
 ** Lantas kenapa emacs?
@@ -60,7 +55,9 @@ Karena konfigurasi emacs ditulis menggunakan /emacs lisp (elisp)/, bahasa pemrog
 
 Dokumen ini akan berisi konfigurasi /emacs/ pribadi saya yang saya bentuk dari waktu ke waktu. Jadi dokumen ini akan selalu dirubah dari waktu ke waktu.
 
-* Konfigurasi Sederhana?
+Dan juga, pada saat saya menulis dokumen ini, saya sedang belajar bagaimana caranya menulis, jadi mohon dimaklumi kalo ada beberapa kalimat yang aneh dan tidak jelas.
+
+* Konfigurasi Dasar
 
 Saya tidak tau kenapa ini dan bagaimana kode di bawah ini akan mempercepat eksekusi kode pada berkas ini, mungkin saya akan membaca [[https://nullprogram.com/blog/2016/12/22/][blog ini]] dan menuliskannya disini alasannya.
 
@@ -97,7 +94,7 @@ Saya suka menggunakan font =Iosevka=, karena bentuknya tidak terlalu lebay dan s
       doom-serif-font (font-spec :family "Iosevka Etoile"))
 #+end_src
 
-Dan juga, biar beberapa simbol terlihat lebih mencolok, kita rubah /font/-nya menjadi /italic/.
+Dan juga, biar beberapa simbol terlihat lebih mencolok, saya rubah /font/-nya menjadi /italic/. Saya tau ini dari video-nya Distrotube.
 
 #+begin_src elisp
 (custom-set-faces!
@@ -107,17 +104,15 @@ Dan juga, biar beberapa simbol terlihat lebih mencolok, kita rubah /font/-nya me
 
 *** Line Numbers
 
-Karena kita menggunakan =evil-mode=, maka sudah menjadi suatu keharusan kalau kita menampilkan nomor baris menggunakan mode relatif.
+Karena saya menggunakan =evil-mode=, sudah pasti menampilkan /line numbers/ menggunakan mode relatif itu sangat membantu.
 
 #+begin_src elisp
 (setq display-line-numbers-type 'relative)
 #+end_src
 
-** ORG Mode
+* Mode ORG
 
 Potensi dari =org-mode= ini sangat besar, saya bisa mencatat apa yang perlu saya lakukan, apa yang akan saya lakukan, dan menulis dokumen ini sebagai konfigurasi emacs saya.
-
-*** Konfigurasi Dasar
 
 #+begin_src elisp
 (setq org-directory "~/Documents/org/"            ; tempat penyimpanan berkas-berkas dari org
@@ -133,11 +128,11 @@ Potensi dari =org-mode= ini sangat besar, saya bisa mencatat apa yang perlu saya
       org-fold-catch-invisible-edits 'smart)      ; berhati-hati ketika ada benda yang tidak terlihat
 #+end_src
 
-*** Penampilan
+** Tampilan
 
 Tampilan bawaan ORG Mode itu tidak terlalu menarik menurut saya. Jadi, kita coba solek tampilan si ORG Mode ini dengan beberapa hal.
 
-**** Membuat titik tajuk menjadi lebih menarik
+*** Tajuk
 
 Di dalam org mode, kita menggunakan bintang "*" sebagai penanda tajuk. Cukup membosankan kalau hanya menggunakan bintang, maka dari itu saya menginstal =org-superstar= untuk merubah titik tajuk dari bintang menjadi titik saja.
 
@@ -147,7 +142,7 @@ Di dalam org mode, kita menggunakan bintang "*" sebagai penanda tajuk. Cukup mem
   (setq org-superstar-headline-bullets-list '("•")))
 #+end_src
 
-**** Menyembunyikan Emphasis Marker
+*** Emphasis
 
 ORG Mode akan sangat ramai kalau /emphasis marker/ tidak disembunyikan dari tampilan. Saya menonaktifkan /emphasis marker/ dari tampilan agar telihat lebih bersih. Namun ada kendala lain, jika saya ingin merubah teks yang di dalamnya terdapat /emphasis marker/, maka saya tidak akan pernah tau karena tampilannya sama sekali tidak memberikan tanda-tanda bahwa disitu ada /emphasis marker/.
 
@@ -166,7 +161,7 @@ Maka dari itu, saya menginstal =org-appear=. /Package/ ini bertugas untuk menamp
   (run-at-time nil nil #'org-appear--set-elements))
 #+end_src
 
-*** Presentasi
+** Mode Prensentasi
 
 Saya bisa terlihat keren di depan rekan kerja saya karena ketika saya presentasi saya menggunakan emacs.
 
@@ -182,6 +177,8 @@ Untuk pengaturan presentasi saya di dalam emacs, saya mengikuti tutorial dari [[
   :init
     (add-hook 'org-present-after-navigate-functions '+org-present-prepare-slide))
 #+end_src
+
+*** =+org-present-hook=
 
 Lalu, sama seperti pernyataan sebelumnya, saya juga menyalin =+org-present-hook= dari SystemCrafters juga. Disini saya mengatur ukuran font, menyembunyikan /line numbers/, menyembunyikan /mode-line/, dan menampilkan gambar jika ada di dalam presentasi.
 
@@ -207,6 +204,8 @@ Lalu, sama seperti pernyataan sebelumnya, saya juga menyalin =+org-present-hook=
   (org-display-inline-images))
 #+end_src
 
+*** =+org-present-quit-hook=
+
 Dan juga, karena saya melakukan perubahan terhadap buffer yang digunakan untuk presentasi, mulai dari ukuran font, dan sebagainya, maka saya perlu mengembalikannya seperti semula. Seperti sebelum mode presentasi diaktifkan.
 
 #+begin_src elisp
@@ -222,6 +221,8 @@ Dan juga, karena saya melakukan perubahan terhadap buffer yang digunakan untuk p
   (org-remove-inline-images))
 #+end_src
 
+*** =+org-present-prepare-slide=
+
 Terakhir, ketika melakukan perpindahan /slide/, alangkah baiknya jika setiap /slide/ dilipat dan hanya memperlihatkan garis besarnya saja.
 
 #+begin_src elisp
@@ -235,3 +236,66 @@ Terakhir, ketika melakukan perpindahan /slide/, alangkah baiknya jika setiap /sl
   ;; Show only direct subheadings of the slide but don't expand them
   (org-fold-show-children))
 #+end_src
+
+** Mode Menulis
+
+Saya sepertinya punya ADHD (Diagnosa saya sendiri :D), maka dari itu membuat tempat menulis saya bersih dan tidak terlalu banyak informasi yang kemungkinan besar dapat mendistraksi saya itu sangatlah penting.
+
+Untungnya, Doom Emacs sudah mengabstraksi fitur ini melalui =(:ui zen)=, yang mana sejatinya adalah modifikasi dari =writeroom-mode=.
+
+Writeroom mode menurut saya sangat powerful, karena membuat buffer sangat bersih dan enak dilihat. Dan juga, saya bisa menyembunyikan modeline, sehingga UI dari buffer yang saya gunakan untuk menulis, benar-benar berisi teks yang penting saja.
+
+#+begin_src elisp
+(after! writeroom-mode
+  (pushnew! writeroom--local-variables
+            'display-line-numbers
+            'visual-fill-column-width
+            'org-adapt-indentation
+            'org-superstar-headline-bullets-list
+            'org-superstar-remove-leading-stars)
+  (add-hook! writeroom-mode-enable-hook '+zen-enable-hook)
+  (add-hook! writeroom-mode-disable-hook '+zen-disable-hook))
+#+end_src
+
+*** =+zen-enable-hook=
+
+Kode di bawah ini adalah prosedur yang dijalankan ketika =writeroom-mode= diaktifkan. Saya menonaktifkan beberapa fitur seperti =display-line-numbers= dan mengatur seberapa lebar nanti ukuran paragraf ketika ditampilkan.
+
+Dan juga, merubah tampilan dari tajuk org.
+
+#+begin_src elisp
+(defun +zen-enable-hook ()
+  "Reformat the current Org buffer appearance for cooler look."
+  (when (eq major-mode 'org-mode)
+    (setq display-line-numbers nil                      ;; hide line numbers
+          visual-fill-column-width 96                   ;; set column width
+          org-adapt-indentation t)                      ;; adapt indentation
+
+    ;; when org superstar available
+    (when (featurep 'org-superstar)
+      (setq-local org-superstar-remove-leading-stars t) ;; hide leading stars on org header
+      (org-superstar-restart))                          ;; recompute stars
+
+    ;; enable indent mode
+    (org-indent-mode 1)                                 ;; enable indent mode
+
+    ;; set zen configuration on doom emacs
+    (setq +zen-text-scale 1.5
+          +zen--original-org-indent-mode-p org-indent-mode
+          +zen--original-org-pretty-table-mode-p (bound-and-true-p org-pretty-table-mode))))
+#+end_src
+
+*** =+zen-disable-hook=
+
+Kode di bawah ini adalah prosedur yang dijalankan ketika =writeroom-mode= dinonaktifkan. Intinya hanya untuk mengembalikan tampilan seperti sedia kala.
+
+#+begin_src elisp
+(defun +zen-disable-hook ()
+  "Reverse the effect of `+zen-enable-hook."
+  (when (eq major-mode 'org-mode)
+    (when (featurep 'org-superstar)
+      (org-superstar-restart))
+    (when +zen--original-org-indent-mode-p (org-indent-mode 1))))
+#+end_src
+
+* Mode Pemrograman

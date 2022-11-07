@@ -93,3 +93,40 @@
 
   ;; Show only direct subheadings of the slide but don't expand them
   (org-fold-show-children))
+
+(after! writeroom-mode
+  (pushnew! writeroom--local-variables
+            'display-line-numbers
+            'visual-fill-column-width
+            'org-adapt-indentation
+            'org-superstar-headline-bullets-list
+            'org-superstar-remove-leading-stars)
+  (add-hook! writeroom-mode-enable-hook '+zen-enable-hook)
+  (add-hook! writeroom-mode-disable-hook '+zen-disable-hook))
+
+(defun +zen-enable-hook ()
+  "Reformat the current Org buffer appearance for cooler look."
+  (when (eq major-mode 'org-mode)
+    (setq display-line-numbers nil                      ;; hide line numbers
+          visual-fill-column-width 96                   ;; set column width
+          org-adapt-indentation t)                      ;; adapt indentation
+
+    ;; when org superstar available
+    (when (featurep 'org-superstar)
+      (setq-local org-superstar-remove-leading-stars t) ;; hide leading stars on org header
+      (org-superstar-restart))                          ;; recompute stars
+
+    ;; enable indent mode
+    (org-indent-mode 1)                                 ;; enable indent mode
+
+    ;; set zen configuration on doom emacs
+    (setq +zen-text-scale 1.5
+          +zen--original-org-indent-mode-p org-indent-mode
+          +zen--original-org-pretty-table-mode-p (bound-and-true-p org-pretty-table-mode))))
+
+(defun +zen-disable-hook ()
+  "Reverse the effect of `+zen-enable-hook."
+  (when (eq major-mode 'org-mode)
+    (when (featurep 'org-superstar)
+      (org-superstar-restart))
+    (when +zen--original-org-indent-mode-p (org-indent-mode 1))))
