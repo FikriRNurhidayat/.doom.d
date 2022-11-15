@@ -155,6 +155,9 @@
        (org
         +roam2
         +appear
+        +present
+        +download
+        +cliplink
         +pretty)           ; organize your plain life in plain text
        ;;php               ; perl's insecure younger brother
        ;;plantuml          ; diagrams for confusing people more

@@ -35,7 +35,7 @@
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type 'relative)
 
-;; ==Programming
+;; == Programming
 (setq inferior-lisp-program "ros -Q run") ; tell emacs what to run on the repl when we're working on lisp
 
 ;; == Keybinding
@@ -44,17 +44,19 @@
 ;; == Org
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/Documents/org/"            ; set org directory inside documents
-      org-clock-sound "~/Documents/bababooey.wav" ; set the bell sound
-      truncate-string-ellipsis "…"                ; truncate elipsis
-      org-ellipsis " ▾ "                          ; set elipsis
-      org-roam-directory "~/Documents/roams/"     ; set roam directory on different folder for org
-      org-use-property-inheritance t              ; it's convenient to have properties inherited
-      org-log-done 'time                          ; having the time a item is done sounds convenient
-      org-list-allow-alphabetical t               ; have a. A. a) A) list bullets
-      org-export-in-background t                  ; run export processes in external emacs process
-      org-hide-emphasis-markers t                 ; hide emphasis marker
-      org-fold-catch-invisible-edits 'smart)      ; try not to accidently do weird stuff in invisible regions
+(setq org-directory "~/Documents/org/"                  ; set org directory inside documents
+      org-clock-sound "~/Documents/bababooey.wav"       ; set the bell sound
+      truncate-string-ellipsis "…"                      ; truncate elipsis
+      org-ellipsis " ▾ "                                ; set elipsis
+      org-use-property-inheritance t                    ; it's convenient to have properties inherited
+      org-log-done 'time                                ; having the time a item is done sounds convenient
+      org-list-allow-alphabetical t                     ; have a. A. a) A) list bullets
+      org-export-in-background t                        ; run export processes in external emacs process
+      org-hide-emphasis-markers t                       ; hide emphasis marker
+      org-fold-catch-invisible-edits 'smart)            ; try not to accidently do weird stuff in invisible regions
+
+(setq org-roam-directory (concat org-directory "roams/")
+      +org-agenda-directory (concat org-directory "agenda/"))
 
 ;; Hide number on org-mode
 (add-hook! org-mode (display-line-numbers-mode 0))
@@ -62,46 +64,45 @@
 ;; Run this after org-mode
 (after! org
   (setq org-agenda-custom-commands
-        '(("o" "Di Kantor" tags-todo "@kantor"
-           ((org-agenda-overriding-header "Kantor")
-            (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
+        '(("k" "Di Kantor" tags-todo "@kantor"
+           ((org-agenda-overriding-header "Kantor")))
           ("h" "Di Rumah" tags-todo "@rumah"
-           ((org-agenda-overriding-header "Rumah")
-            (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))))
-
-  ;; Org Agenda
-  (defun my-org-agenda-skip-all-siblings-but-first ()
-    "Skip all but the first non-done entry."
-    (let (should-skip-entry)
-      (unless (org-current-is-todo)
-        (setq should-skip-entry t))
-      (save-excursion
-        (while (and (not should-skip-entry) (org-goto-sibling t))
-          (when (org-current-is-todo)
-            (setq should-skip-entry t))))
-      (when should-skip-entry
-        (or (outline-next-heading)
-            (goto-char (point-max))))))
-
-  (defun org-current-is-todo ()
-    (string= "TODO" (org-get-todo-state)))
-
-  (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
-  (setq org-todo-keywords-for-agenda '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
-  (setq org-agenda-files '("~/Documents/gtd/Box.org"
-                           "~/Documents/gtd/Projects.org"
-                           "~/Documents/gtd/Tickler.org"))
-
-  (setq org-refile-targets '(("~/Documents/gtd/Projects.org" :maxlevel . 3)
-                             ("~/Documents/gtd/Maybe.org" :level . 1)
-                             ("~/Documents/gtd/Tickler.org" :maxlevel . 2)))
-
-  (setq org-capture-templates '(("t" "Todo [inbox]" entry
-                                 (file "~/Documents/gtd/Box.org")
+           ((org-agenda-overriding-header "Rumah")))
+          ("o" "Agenda"
+           ((agenda ""
+                    ((org-agenda-span 'day)
+                     (org-deadline-warning-days 365)))
+            (todo "TODO"
+                  ((org-agenda-overriding-header "To Refile")
+                   (org-agenda-files '("~/Documents/org/agenda/INBOX.org"))))
+            (todo "NEXT"
+                  ((org-agenda-overriding-header "In Progress")
+                   (org-agenda-files '("~/Documents/org/agenda/PROJECTS.org"
+                                       "~/Documents/org/agenda/MAYBE.org"
+                                       "~/Documents/org/agenda/NEXT.org"))))
+            (todo "TODO"
+                  ((org-agenda-overriding-header "Projects")
+                   (org-agenda-files '("~/Documents/org/agenda/PROJECTS.org"))))
+            (todo "TODO"
+                  ((org-agenda-overriding-header "One-off Tasks")
+                   (org-agenda-files '("~/Documents/org/agenda/NEXT.org"))
+                   (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline 'scheduled))))
+            nil))))
+  (setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                            (sequence "WAIT(w@/!)" "HOLD(h@/!)" "|" "VOID(c@/!)")))
+  (setq org-agenda-files '("~/Documents/org/agenda/INBOX.org"
+                           "~/Documents/org/agenda/PROJECTS.org"
+                           "~/Documents/org/agenda/MAYBE.org"))
+  (setq org-refile-targets '(("PROJECTS.org" :maxlevel . 3)
+                             ("MAYBE.org" :level . 1)
+                             ("NEXT.org" :maxlevel . 2)
+                             ("BOOK.org" :maxlevel . 3)))
+  (setq org-capture-templates '(("i" "Inbox" entry (file "~/Documents/org/agenda/INBOX.org")
                                  "* TODO %i%?")
-                                ("T" "Tickler" entry
-                                 (file "~/Documents/gtd/Tickler.org")
-                                 "* %i%? \n %U"))))
+                                ("l" "Link" entry (file "~/Documents/org/agenda/INBOX.org")
+                                 "* TODO %(org-cliplink-capture)" :immediate-finish t)
+                                ("c" "Capture Website" entry (file "~/Documents/org/agenda/INBOX.org")
+                                 "* TODO [[%:link][%:description]]\n\n %i" :immediate-finish t))))
 
 (use-package! org-superstar
   :config
@@ -476,7 +477,7 @@
             :arrow_right   "→"
             :arrow_left    "←"
             :title         "𝙏"
-            :email         ""
+            :email         "E"
             :subtitle      "𝙩"
             :author        "𝘼"
             :date          "𝘿"
@@ -500,18 +501,49 @@
             :results       "🠶"
             :begin_export  "⏩"
             :end_export    "⏪"
-            :properties    "⚙"
+            :properties    "◉"
             :end           "∎"
-            :priority_a   ,(propertize "⚑" 'face 'all-the-icons-red)
-            :priority_b   ,(propertize "⬆" 'face 'all-the-icons-orange)
-            :priority_c   ,(propertize "■" 'face 'all-the-icons-yellow)
-            :priority_d   ,(propertize "⬇" 'face 'all-the-icons-green)
-            :priority_e   ,(propertize "❓" 'face 'all-the-icons-blue)))
+            :priority_a   ,(propertize "◉" 'face 'all-the-icons-red)
+            :priority_b   ,(propertize "◉" 'face 'all-the-icons-orange)
+            :priority_c   ,(propertize "◉" 'face 'all-the-icons-yellow)
+            :priority_d   ,(propertize "◉" 'face 'all-the-icons-green)
+            :priority_e   ,(propertize "◉" 'face 'all-the-icons-blue)))
 
 (require 'ob-js)
 (add-to-list 'org-babel-load-languages '(js . t))
 (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)
 (add-to-list 'org-babel-tangle-lang-exts '("js" . "js"))
+
+;; (plist-put +ligatures-extra-symbols :name "⁍")
+;; (plist-put +ligatures-extra-symbols :begin_example "⏩")
+;; (plist-put +ligatures-extra-symbols :end_example "⏪")
+
+(map-delete +ligatures-extra-symbols :def)
+(map-delete +ligatures-extra-symbols :composition)
+(map-delete +ligatures-extra-symbols :map)
+(map-delete +ligatures-extra-symbols :null)
+(map-delete +ligatures-extra-symbols :true)
+(map-delete +ligatures-extra-symbols :false)
+(map-delete +ligatures-extra-symbols :int)
+(map-delete +ligatures-extra-symbols :float)
+(map-delete +ligatures-extra-symbols :str)
+(map-delete +ligatures-extra-symbols :bool)
+(map-delete +ligatures-extra-symbols :list)
+(map-delete +ligatures-extra-symbols :not)
+(map-delete +ligatures-extra-symbols :in)
+(map-delete +ligatures-extra-symbols :not-in)
+(map-delete +ligatures-extra-symbols :and)
+(map-delete +ligatures-extra-symbols :or)
+(map-delete +ligatures-extra-symbols :for)
+(map-delete +ligatures-extra-symbols :some)
+(map-delete +ligatures-extra-symbols :return)
+(map-delete +ligatures-extra-symbols :yield)
+(map-delete +ligatures-extra-symbols :union)
+(map-delete +ligatures-extra-symbols :intersect)
+(map-delete +ligatures-extra-symbols :diff)
+(map-delete +ligatures-extra-symbols :tuple)
+(map-delete +ligatures-extra-symbols :pipe)
+(map-delete +ligatures-extra-symbols :dot)
 
 (set-ligatures! 'org-mode
   :merge t
@@ -556,36 +588,6 @@
   :priority_c    "[#C]"
   :priority_d    "[#D]"
   :priority_e    "[#E]")
-(plist-put +ligatures-extra-symbols :name "⁍")
-(plist-put +ligatures-extra-symbols :begin_example "⏩")
-(plist-put +ligatures-extra-symbols :end_example "⏪")
-
-(map-delete +ligatures-extra-symbols :def)
-(map-delete +ligatures-extra-symbols :composition)
-(map-delete +ligatures-extra-symbols :map)
-(map-delete +ligatures-extra-symbols :null)
-(map-delete +ligatures-extra-symbols :true)
-(map-delete +ligatures-extra-symbols :false)
-(map-delete +ligatures-extra-symbols :int)
-(map-delete +ligatures-extra-symbols :float)
-(map-delete +ligatures-extra-symbols :str)
-(map-delete +ligatures-extra-symbols :bool)
-(map-delete +ligatures-extra-symbols :list)
-(map-delete +ligatures-extra-symbols :not)
-(map-delete +ligatures-extra-symbols :in)
-(map-delete +ligatures-extra-symbols :not-in)
-(map-delete +ligatures-extra-symbols :and)
-(map-delete +ligatures-extra-symbols :or)
-(map-delete +ligatures-extra-symbols :for)
-(map-delete +ligatures-extra-symbols :some)
-(map-delete +ligatures-extra-symbols :return)
-(map-delete +ligatures-extra-symbols :yield)
-(map-delete +ligatures-extra-symbols :union)
-(map-delete +ligatures-extra-symbols :intersect)
-(map-delete +ligatures-extra-symbols :diff)
-(map-delete +ligatures-extra-symbols :tuple)
-(map-delete +ligatures-extra-symbols :pipe)
-(map-delete +ligatures-extra-symbols :dot)
 
 (setq emojify-emoji-set "twemoji-v2")
 (defvar emojify-disabled-emojis
@@ -835,3 +837,22 @@
     (exwm-enable)))
 
 (after! doom (doom/set-frame-opacity 97))
+
+(setq max-mini-window-height 0.125)
+
+(use-package! websocket
+  :after org-roam)
+
+(use-package! org-roam-ui
+    :after org-roam ;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+;;  :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+
+(load! "lisp/org-mini/org-mini")
