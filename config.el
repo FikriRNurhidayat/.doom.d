@@ -15,11 +15,11 @@
 ;;   presentations or streaming.
 ;; - `doom-unicode-font' -- for unicode glyphs
 ;; - `doom-\serif-font' -- for the `fixed-pitch-serif' face
-(setq doom-font (font-spec :family "Iosevka Term" :size 16)
-      doom-big-font (font-spec :family "Iosevka Term" :size 24)
-      doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 16 :weight 'light)
+(setq doom-font (font-spec :family "Iosevka Fixed" :size 16)
+      doom-big-font (font-spec :size 24)
+      doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 16 :weight 'normal)
       doom-unicode-font (font-spec :family "JuliaMono")
-      doom-serif-font (font-spec :family "Iosevka Etoile"))
+      doom-serif-font (font-spec :family "Iosevka Etoile" :weight 'normal))
 
 ;; Set slant on some font
 (custom-set-faces!
@@ -28,7 +28,15 @@
 
 ;; === Theme
 ;; Nord because it's cool, I guess.
-(setq doom-theme 'doom-nord)
+(setq doom-theme 'doom-nord-aurora)
+
+(dolist (face '(window-divider
+                window-divider-first-pixel
+                window-divider-last-pixel))
+  (face-spec-reset-face face)
+  (set-face-foreground face (face-attribute 'default :background)))
+
+(set-face-background 'fringe (face-attribute 'default :background))
 
 ;; === Line Numbers
 ;; This determines the style of line numbers in effect. If set to `nil', line
@@ -44,8 +52,8 @@
 ;; == Org
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/Documents/org/"                  ; set org directory inside documents
-      org-clock-sound "~/Documents/bababooey.wav"       ; set the bell sound
+(setq org-directory "/home/fain/Documents/org/"                  ; set org directory inside documents
+      org-clock-sound "/home/fain/Documents/bababooey.wav"       ; set the bell sound
       truncate-string-ellipsis "…"                      ; truncate elipsis
       org-ellipsis " ▾ "                                ; set elipsis
       org-use-property-inheritance t                    ; it's convenient to have properties inherited
@@ -90,9 +98,7 @@
             nil))))
   (setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
                             (sequence "WAIT(w@/!)" "HOLD(h@/!)" "|" "VOID(c@/!)")))
-  (setq org-agenda-files '("~/Documents/org/agenda/INBOX.org"
-                           "~/Documents/org/agenda/PROJECTS.org"
-                           "~/Documents/org/agenda/MAYBE.org"))
+  (setq org-agenda-files (mapcar (lambda (file) (concat +org-agenda-directory file)) '("PROJECTS.org" "INBOX.org" "MAYBE.org" "NEXT.org")))
   (setq org-refile-targets '(("PROJECTS.org" :maxlevel . 3)
                              ("MAYBE.org" :level . 1)
                              ("NEXT.org" :maxlevel . 2)
@@ -128,14 +134,6 @@
    '(("d" "Default" plain
       "%?"
       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-      :unnarrowed t)
-     ("m" "Meeting Note" plain
-      "* Participants\n\n- %?\n\n* Goals\n\n- Meeting Goals goes here!\n\n* Discussion Topics\n\n- Lorem ipsum\n\n* Action Items\n\n** TODO Write the meeting goals"
-      :if-new (file+head "work/mom/%<%Y%m%d%H%M%S>.${slug}.org" "#+title: ${title}\n#+filetags: :@kantor:@mom:\n")
-      :unnarrowed t)
-     ("p" "Presentation" plain
-      "%?"
-      :if-new (file+head "work/presentation/%<%Y%m%d%H%M%S>.${slug}.org" "#+title: ${title}\n")
       :unnarrowed t)))
   (org-roam-complete-everywhere t))
 
@@ -146,12 +144,6 @@
   ;; TODO: Map family using variable
   (setq-local face-remapping-alist '((default (:height 2.0) variable-pitch)
                                      (header-line (:height 4.0) variable-pitch)
-                                     ;; (org-level-1 (:height 1.0) org-level-1)
-                                     ;; (org-level-2 (:height 1.0) org-level-2)
-                                     ;; (org-level-3 (:height 1.0) org-level-3)
-                                     ;; (org-level-4 (:height 1.0) org-level-4)
-                                     ;; (org-level-5 (:height 1.0) org-level-5)
-                                     ;; (org-level-6 (:height 1.0) org-level-6)
                                      (org-document-title (:height 2.0) org-document-title)
                                      (org-table (:height 0.5 :family "Iosevka") org-table)
                                      (org-code (:height 1.0 :family "Iosevka") org-code)
@@ -196,9 +188,6 @@
   :init
     (add-hook 'org-present-after-navigate-functions '+org-present-prepare-slide))
 
-(use-package! org-pretty-table
-  :commands (org-pretty-table-mode global-org-pretty-table-mode))
-
 ;; == Markdown
 (add-hook! markdown-mode (display-line-numbers-mode 0)) ; Hide line number on markdown mode
 
@@ -221,6 +210,38 @@
 (defvar +zen-serif-p t
   "Whether to use a serifed font with `mixed-pitch-mode'.")
 
+(defvar +zen-org-level-scale '((org-level-1 . 1.25)
+                               (org-level-2 . 1.125)
+                               (org-level-3 . 1.0625)
+                               (org-level-4 . 1.0)
+                               (org-level-5 . 1.0)
+                               (org-level-6 . 1.0)
+                               (org-level-7 . 1.0)
+                               (org-level-8 . 1.0))
+  "Org level size remap.")
+
+(defun +zen-prose-org-h ()
+  "Reformat the current Org buffer appearance for prose."
+  (when (eq major-mode 'org-mode)
+    (setq display-line-numbers nil
+          visual-fill-column-width 72
+          org-adapt-indentation t)
+    (when (featurep 'org-superstar)
+      (setq-local org-superstar-remove-leading-stars t)
+      (org-superstar-restart))
+    (setq-local face-remapping-alist (mapcar (lambda (face) `(,(car face) (:height ,(cdr face))  ,(car face))) +zen-org-level-scale))
+    (setq +zen-text-scale 1.619
+          +zen--original-org-indent-mode-p org-indent-mode
+          +zen--original-org-pretty-table-mode-p (bound-and-true-p org-pretty-table-mode))))
+
+(defun +zen-nonprose-org-h ()
+  "Reverse the effect of `+zen-prose-org'."
+  (when (eq major-mode 'org-mode)
+    (setq-local face-remapping-alist nil)
+    (when (featurep 'org-superstar)
+      (setq-local org-superstar-remove-leading-stars nil)
+      (org-superstar-restart))))
+
 (after! writeroom-mode
   (setq +zen--original-org-indent-mode-p t)
   (setq +zen--original-org-pretty-table-mode-p nil)
@@ -230,412 +251,8 @@
             'org-adapt-indentation
             'org-superstar-headline-bullets-list
             'org-superstar-remove-leading-stars)
-  (add-hook 'writeroom-mode-enable-hook
-            (defun +zen-prose-org-h ()
-              "Reformat the current Org buffer appearance for prose."
-              (when (eq major-mode 'org-mode)
-                (setq display-line-numbers nil
-                      visual-fill-column-width 96
-                      org-adapt-indentation nil)
-                (when (featurep 'org-superstar)
-                  (setq-local org-superstar-remove-leading-stars t)
-                  (org-superstar-restart))
-                (org-indent-mode 0)
-                (setq +zen-text-scale 1.5
-                      +zen--original-org-indent-mode-p org-indent-mode
-                      +zen--original-org-pretty-table-mode-p (bound-and-true-p org-pretty-table-mode)))))
-  (add-hook 'writeroom-mode-disable-hook
-            (defun +zen-nonprose-org-h ()
-              "Reverse the effect of `+zen-prose-org'."
-              (when (eq major-mode 'org-mode)
-                (when (featurep 'org-superstar)
-                  (org-superstar-restart))
-                (when +zen--original-org-indent-mode-p (org-indent-mode 1))))))
-
-;; (defvar fancy-splash-image-template
-;;   (expand-file-name "misc/splash-images/emacs-e-template.svg" doom-user-dir)
-;;   "Default template svg used for the splash image, with substitutions from ")
-
-;; (defvar fancy-splash-sizes
-;;   `((:height 300 :min-height 50 :padding (0 . 2))
-;;     (:height 250 :min-height 42 :padding (2 . 4))
-;;     (:height 200 :min-height 35 :padding (3 . 3))
-;;     (:height 150 :min-height 28 :padding (3 . 3))
-;;     (:height 100 :min-height 20 :padding (2 . 2))
-;;     (:height 75  :min-height 15 :padding (2 . 1))
-;;     (:height 50  :min-height 10 :padding (1 . 0))
-;;     (:height 1   :min-height 0  :padding (0 . 0)))
-;;   "list of plists with the following properties
-;;   :height the height of the image
-;;   :min-height minimum `frame-height' for image
-;;   :padding `+doom-dashboard-banner-padding' (top . bottom) to apply
-;;   :template non-default template file
-;;   :file file to use instead of template")
-
-;; (defvar fancy-splash-template-colours
-;;   '(("$colour1" . keywords) ("$colour2" . type) ("$colour3" . base5) ("$colour4" . base8))
-;;   "list of colour-replacement alists of the form (\"$placeholder\" . 'theme-colour) which applied the template")
-
-;; (unless (file-exists-p (expand-file-name "theme-splashes" doom-cache-dir))
-;;   (make-directory (expand-file-name "theme-splashes" doom-cache-dir) t))
-
-;; (defun fancy-splash-filename (theme-name height)
-;;   (expand-file-name (concat (file-name-as-directory "theme-splashes")
-;;                             theme-name
-;;                             "-" (number-to-string height) ".svg")
-;;                     doom-cache-dir))
-
-;; (defun fancy-splash-clear-cache ()
-;;   "Delete all cached fancy splash images"
-;;   (interactive)
-;;   (delete-directory (expand-file-name "theme-splashes" doom-cache-dir) t)
-;;   (message "Cache cleared!"))
-
-;; (defun fancy-splash-generate-image (template height)
-;;   "Read TEMPLATE and create an image if HEIGHT with colour substitutions as
-;;    described by `fancy-splash-template-colours' for the current theme"
-;;   (with-temp-buffer
-;;     (insert-file-contents template)
-;;     (re-search-forward "$height" nil t)
-;;     (replace-match (number-to-string height) nil nil)
-;;     (dolist (substitution fancy-splash-template-colours)
-;;       (goto-char (point-min))
-;;       (while (re-search-forward (car substitution) nil t)
-;;         (replace-match (doom-color (cdr substitution)) nil nil)))
-;;     (write-region nil nil
-;;                   (fancy-splash-filename (symbol-name doom-theme) height) nil nil)))
-
-;; (defun fancy-splash-generate-images ()
-;;   "Perform `fancy-splash-generate-image' in bulk"
-;;   (dolist (size fancy-splash-sizes)
-;;     (unless (plist-get size :file)
-;;       (fancy-splash-generate-image (or (plist-get size :template)
-;;                                        fancy-splash-image-template)
-;;                                    (plist-get size :height)))))
-
-;; (defun ensure-theme-splash-images-exist (&optional height)
-;;   (unless (file-exists-p (fancy-splash-filename
-;;                           (symbol-name doom-theme)
-;;                           (or height
-;;                               (plist-get (car fancy-splash-sizes) :height))))
-;;     (fancy-splash-generate-images)))
-
-;; (defun get-appropriate-splash ()
-;;   (let ((height (frame-height)))
-;;     (cl-some (lambda (size) (when (>= height (plist-get size :min-height)) size))
-;;              fancy-splash-sizes)))
-
-;; (setq fancy-splash-last-size nil)
-;; (setq fancy-splash-last-theme nil)
-;; (defun set-appropriate-splash (&rest _)
-;;   (let ((appropriate-image (get-appropriate-splash)))
-;;     (unless (and (equal appropriate-image fancy-splash-last-size)
-;;                  (equal doom-theme fancy-splash-last-theme)))
-;;     (unless (plist-get appropriate-image :file)
-;;       (ensure-theme-splash-images-exist (plist-get appropriate-image :height)))
-;;     (setq fancy-splash-image
-;;           (or (plist-get appropriate-image :file)
-;;               (fancy-splash-filename (symbol-name doom-theme) (plist-get appropriate-image :height))))
-;;     (setq +doom-dashboard-banner-padding (plist-get appropriate-image :padding))
-;;     (setq fancy-splash-last-size appropriate-image)
-;;     (setq fancy-splash-last-theme doom-theme)
-;;     (+doom-dashboard-reload)))
-
-;; (add-hook 'window-size-change-functions #'set-appropriate-splash)
-;; (add-hook 'doom-load-theme-hook #'set-appropriate-splash)
-
-;; (defvar splash-phrase-source-folder
-;;   (expand-file-name "misc/splash-phrases" doom-user-dir)
-;;   "A folder of text files with a fun phrase on each line.")
-
-;; (defvar splash-phrase-sources
-;;   (let* ((files (directory-files splash-phrase-source-folder nil "\\.txt\\'"))
-;;          (sets (delete-dups (mapcar
-;;                              (lambda (file)
-;;                                (replace-regexp-in-string "\\(?:-[0-9]+-\\w+\\)?\\.txt" "" file))
-;;                              files))))
-;;     (mapcar (lambda (sset)
-;;               (cons sset
-;;                     (delq nil (mapcar
-;;                                (lambda (file)
-;;                                  (when (string-match-p (regexp-quote sset) file)
-;;                                    file))
-;;                                files))))
-;;             sets))
-;;   "A list of cons giving the phrase set name, and a list of files which contain phrase components.")
-
-;; (defvar splash-phrase-set
-;;   (nth (random (length splash-phrase-sources)) (mapcar #'car splash-phrase-sources))
-;;   "The default phrase set. See `splash-phrase-sources'.")
-
-;; (defun splase-phrase-set-random-set ()
-;;   "Set a new random splash phrase set."
-;;   (interactive)
-;;   (setq splash-phrase-set
-;;         (nth (random (1- (length splash-phrase-sources)))
-;;              (cl-set-difference (mapcar #'car splash-phrase-sources) (list splash-phrase-set))))
-;;   (+doom-dashboard-reload t))
-
-;; (defvar splase-phrase--cache nil)
-
-;; (defun splash-phrase-get-from-file (file)
-;;   "Fetch a random line from FILE."
-;;   (let ((lines (or (cdr (assoc file splase-phrase--cache))
-;;                    (cdar (push (cons file
-;;                                      (with-temp-buffer
-;;                                        (insert-file-contents (expand-file-name file splash-phrase-source-folder))
-;;                                        (split-string (string-trim (buffer-string)) "\n")))
-;;                                splase-phrase--cache)))))
-;;     (nth (random (length lines)) lines)))
-
-;; (defun splash-phrase (&optional set)
-;;   "Construct a splash phrase from SET. See `splash-phrase-sources'."
-;;   (mapconcat
-;;    #'splash-phrase-get-from-file
-;;    (cdr (assoc (or set splash-phrase-set) splash-phrase-sources))
-;;    " "))
-
-;; (defun doom-dashboard-phrase ()
-;;   "Get a splash phrase, flow it over multiple lines as needed, and make fontify it."
-;;   (mapconcat
-;;    (lambda (line)
-;;      (+doom-dashboard--center
-;;       +doom-dashboard--width
-;;       (with-temp-buffer
-;;         (insert-text-button
-;;          line
-;;          'action
-;;          (lambda (_) (+doom-dashboard-reload t))
-;;          'face 'doom-dashboard-menu-title
-;;          'mouse-face 'doom-dashboard-menu-title
-;;          'help-echo "Random phrase"
-;;          'follow-link t)
-;;         (buffer-string))))
-;;    (split-string
-;;     (with-temp-buffer
-;;       (insert (splash-phrase))
-;;       (setq fill-column (min 70 (/ (* 2 (window-width)) 3)))
-;;       (fill-region (point-min) (point-max))
-;;       (buffer-string))
-;;     "\n")
-;;    "\n"))
-
-;; (defadvice! doom-dashboard-widget-loaded-with-phrase ()
-;;   :override #'doom-dashboard-widget-loaded
-;;   (setq line-spacing 0.2)
-;;   (insert
-;;    "\n"
-;;    (doom-dashboard-phrase)
-;;    "\n"))
-
-;; (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
-;; (add-hook! '+doom-dashboard-mode-hook (hide-mode-line-mode 1) (hl-line-mode -1))
-;; (setq-hook! '+doom-dashboard-mode-hook evil-normal-state-cursor (list nil))
-
-;;
-;; Whenever you reconfigure a package, make sure to wrap your config in an
-;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
-;;
-;;   (after! PACKAGE
-;;     (setq x y))
-;;
-;; The exceptions to this rule:
-;;
-;;   - Setting file/directory variables (like `org-directory')
-;;   - Setting variables which explicitly tell you to set them before their
-;;     package is loaded (see 'C-h v VARIABLE' to look up their documentation).
-;;   - Setting doom variables (which start with 'doom-' or '+').
-;;
-;; Here are some additional functions/macros that will help you configure Doom.
-;;
-;; - `load!' for loading external *.el files relative to this one
-;; - `use-package!' for configuring packages
-;; - `after!' for running code after a package has loaded
-;; - `add-load-path!' for adding directories to the `load-path', relative to
-;;   this file. Emacs searches the `load-path' when you load packages with
-;;   `require' or `use-package'.
-;; - `map!' for binding new keys
-;;
-;; To get information about any of these functions/macros, move the cursor over
-;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
-;; This will open documentation for it, including demos of how they are used.
-;; Alternatively, use `C-h o' to look up a symbol (functions, variables, faces,
-;; etc).
-;;
-;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
-;; they are implemented.
-
-
-(appendq! +ligatures-extra-symbols
-          `(:checkbox      "☐"
-            :pending       "◼"
-            :checkedbox    "☑"
-            :filetags      ""
-            :list_property "∷"
-            :em_dash       "—"
-            :ellipses      "…"
-            :arrow_right   "→"
-            :arrow_left    "←"
-            :title         "𝙏"
-            :email         "E"
-            :subtitle      "𝙩"
-            :author        "𝘼"
-            :date          "𝘿"
-            :property      "☸"
-            :options       "⌥"
-            :startup       "⏻"
-            :macro         "𝓜"
-            :html_head     "🅷"
-            :html          "🅗"
-            :latex_class   "🄻"
-            :latex_header  "🅻"
-            :beamer_header "🅑"
-            :latex         "🅛"
-            :attr_latex    "🄛"
-            :attr_html     "🄗"
-            :attr_org      "⒪"
-            :begin_quote   "❝"
-            :end_quote     "❞"
-            :caption       "☰"
-            :header        "›"
-            :results       "🠶"
-            :begin_export  "⏩"
-            :end_export    "⏪"
-            :properties    "◉"
-            :end           "∎"
-            :priority_a   ,(propertize "◉" 'face 'all-the-icons-red)
-            :priority_b   ,(propertize "◉" 'face 'all-the-icons-orange)
-            :priority_c   ,(propertize "◉" 'face 'all-the-icons-yellow)
-            :priority_d   ,(propertize "◉" 'face 'all-the-icons-green)
-            :priority_e   ,(propertize "◉" 'face 'all-the-icons-blue)))
-
-(require 'ob-js)
-(add-to-list 'org-babel-load-languages '(js . t))
-(org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)
-(add-to-list 'org-babel-tangle-lang-exts '("js" . "js"))
-
-;; (plist-put +ligatures-extra-symbols :name "⁍")
-;; (plist-put +ligatures-extra-symbols :begin_example "⏩")
-;; (plist-put +ligatures-extra-symbols :end_example "⏪")
-
-(map-delete +ligatures-extra-symbols :def)
-(map-delete +ligatures-extra-symbols :composition)
-(map-delete +ligatures-extra-symbols :map)
-(map-delete +ligatures-extra-symbols :null)
-(map-delete +ligatures-extra-symbols :true)
-(map-delete +ligatures-extra-symbols :false)
-(map-delete +ligatures-extra-symbols :int)
-(map-delete +ligatures-extra-symbols :float)
-(map-delete +ligatures-extra-symbols :str)
-(map-delete +ligatures-extra-symbols :bool)
-(map-delete +ligatures-extra-symbols :list)
-(map-delete +ligatures-extra-symbols :not)
-(map-delete +ligatures-extra-symbols :in)
-(map-delete +ligatures-extra-symbols :not-in)
-(map-delete +ligatures-extra-symbols :and)
-(map-delete +ligatures-extra-symbols :or)
-(map-delete +ligatures-extra-symbols :for)
-(map-delete +ligatures-extra-symbols :some)
-(map-delete +ligatures-extra-symbols :return)
-(map-delete +ligatures-extra-symbols :yield)
-(map-delete +ligatures-extra-symbols :union)
-(map-delete +ligatures-extra-symbols :intersect)
-(map-delete +ligatures-extra-symbols :diff)
-(map-delete +ligatures-extra-symbols :tuple)
-(map-delete +ligatures-extra-symbols :pipe)
-(map-delete +ligatures-extra-symbols :dot)
-
-(set-ligatures! 'org-mode
-  :merge t
-  :filetags      "#+filetags:"
-  :checkbox      "[ ]"
-  :pending       "[-]"
-  :checkedbox    "[X]"
-  :list_property "::"
-  :em_dash       "---"
-  :ellipsis      "..."
-  :arrow_right   "->"
-  :arrow_left    "<-"
-  :title         "#+title:"
-  :email         "#+email:"
-  :subtitle      "#+subtitle:"
-  :author        "#+author:"
-  :date          "#+date:"
-  :property      "#+property:"
-  :options       "#+options:"
-  :startup       "#+startup:"
-  :macro         "#+macro:"
-  :html_head     "#+html_head:"
-  :html          "#+html:"
-  :latex_class   "#+latex_class:"
-  :latex_header  "#+latex_header:"
-  :beamer_header "#+beamer_header:"
-  :latex         "#+latex:"
-  :attr_latex    "#+attr_latex:"
-  :attr_html     "#+attr_html:"
-  :attr_org      "#+attr_org:"
-  :begin_quote   "#+begin_quote"
-  :end_quote     "#+end_quote"
-  :caption       "#+caption:"
-  :header        "#+header:"
-  :begin_export  "#+begin_export"
-  :end_export    "#+end_export"
-  :results       "#+RESULTS:"
-  :property      ":PROPERTIES:"
-  :end           ":END:"
-  :priority_a    "[#A]"
-  :priority_b    "[#B]"
-  :priority_c    "[#C]"
-  :priority_d    "[#D]"
-  :priority_e    "[#E]")
-
-(setq emojify-emoji-set "twemoji-v2")
-(defvar emojify-disabled-emojis
-  '(;; Org
-    "◼" "☑" "☸" "⚙" "⏩" "⏪" "⬆" "⬇" "❓"
-    ;; Terminal powerline
-    "✔"
-    ;; Box drawing
-    "▶" "◀"
-    ;; I just want to see this as text
-    "©" "™")
-  "Characters that should never be affected by `emojify-mode'.")
-
-(defadvice! emojify-delete-from-data ()
-  "Ensure `emojify-disabled-emojis' don't appear in `emojify-emojis'."
-  :after #'emojify-set-emoji-data
-  (dolist (emoji emojify-disabled-emojis)
-    (remhash emoji emojify-emojis)))
-
-(defun emojify--replace-text-with-emoji (orig-fn emoji text buffer start end &optional target)
-  "Modify `emojify--propertize-text-for-emoji' to replace ascii/github emoticons with unicode emojis, on the fly."
-  (if (or (not emoticon-to-emoji) (= 1 (length text)))
-      (funcall orig-fn emoji text buffer start end target)
-    (delete-region start end)
-    (insert (ht-get emoji "unicode"))))
-
-(define-minor-mode emoticon-to-emoji
-  "Write ascii/gh emojis, and have them converted to unicode live."
-  :global nil
-  :init-value nil
-  (if emoticon-to-emoji
-      (progn
-        (setq-local emojify-emoji-styles '(ascii github unicode))
-        (advice-add 'emojify--propertize-text-for-emoji :around #'emojify--replace-text-with-emoji)
-        (unless emojify-mode
-          (emojify-turn-on-emojify-mode)))
-    (setq-local emojify-emoji-styles (default-value 'emojify-emoji-styles))
-    (advice-remove 'emojify--propertize-text-for-emoji #'emojify--replace-text-with-emoji)))
-
-(dolist (face '((org-level-1 . 1.44)
-                (org-level-2 . 1.25)
-                (org-level-3 . 1.125)
-                (org-level-4 . 1.0)
-                (org-level-5 . 1.0)
-                (org-level-6 . 1.0)
-                (org-level-7 . 1.0)
-                (org-level-8 . 1.0)))
-  (set-face-attribute (car face) nil :font doom-variable-pitch-font :weight 'medium :height (cdr face)))
+  (add-hook 'writeroom-mode-enable-hook #'+zen-prose-org-h))
+  (add-hook 'writeroom-mode-disable-hook #'+zen-nonprose-org-h)
 
 (map! :leader
       :desc "Present"
@@ -644,7 +261,7 @@
 (use-package! doom-modeline
   :init
   (setq doom-modeline-height 48)
-  (setq doom-modeline-bar-width 4)
+  (setq doom-modeline-bar-width 8)
   (setq doom-modeline-hud nil)
   (setq doom-modeline-icon t)
   (setq doom-modeline-window-width-limit nil)
@@ -759,87 +376,6 @@
 (after! protobuf-mode
   (set-formatter! 'protofmt "buf format -w" :modes '(protobuf-mode)))
 
-;; (flycheck-define-checker buf
-;;   "A Proto syntax checker using the buf.build linter. See https://docs.buf.build/lint/usage."
-;;   :command ("buf" "lint" source)
-;;   :error-patterns
-;;   ((error line-start (file-name) ":" line ":" column ":" (message) line-end))
-;;   :modes protobuf-mode)
-
-(use-package! lsp-mode
-  :config
-  (add-to-list 'lsp-language-id-configuration '(protobuf-mode . "protobuf"))
-  (lsp-register-client
-   (make-lsp-client :new-connection (lsp-stdio-connection "bufls serve")
-                    :activation-fn (lsp-activate-on "protobuf")
-                    :server-id 'bufls)))
-
-(defun +exwm-update-class ()
-  (exwm-workspace-rename-buffer exwm-class-name))
-
-(setq +exwm-enabled (and (eq window-system 'x)
-                         (seq-contains-p command-line-args "--use-exwm")))
-
-(use-package! exwm
-  :config
-  ;; Set the default number of workspaces
-  (setq garbage-collection-messages nil)
-  (setq exwm-workspace-number 5)
-
-  ;; When window "class" updates, use it to set the buffer name
-  (add-hook 'exwm-update-class-hook #'+exwm-update-class)
-
-  ;; These keys should always pass through to Emacs
-  (setq exwm-input-prefix-keys
-        '(?\C-x
-          ?\C-u
-          ?\C-h
-          ?\M-x
-          ?\M-`
-          ?\M-&
-          ?\M-:
-          ?\C-\M-j  ;; Buffer list
-          ?\C-\ ))  ;; Ctrl+Space
-
-  ;; Ctrl+Q will enable the next key to be sent directly
-  (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
-
-  ;; Set up global key bindings.  These always work, no matter the input state!
-  ;; Keep in mind that changing this list after EXWM initializes has no effect.
-  (setq exwm-input-global-keys
-        `(
-          ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
-          ([?\s-r] . exwm-reset)
-
-          ;; Move between windows
-          ([s-left] . windmove-left)
-          ([s-right] . windmove-right)
-          ([s-up] . windmove-up)
-          ([s-down] . windmove-down)
-
-          ;; Launch applications via shell command
-          ([?\s-&] . (lambda (command)
-                       (interactive (list (read-shell-command "$ ")))
-                       (start-process-shell-command command nil command)))
-
-          ;; Switch workspace
-          ([?\s-w] . exwm-workspace-switch)
-
-          ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
-          ,@(mapcar (lambda (i)
-                      `(,(kbd (format "s-%d" i)) .
-                        (lambda ()
-                          (interactive)
-                          (exwm-workspace-switch-create ,i))))
-                    (number-sequence 0 9))))
-
-  (when +exwm-enabled
-    (exwm-enable)))
-
-(after! doom (doom/set-frame-opacity 97))
-
-(setq max-mini-window-height 0.125)
-
 (use-package! websocket
   :after org-roam)
 
@@ -856,3 +392,36 @@
           org-roam-ui-open-on-start t))
 
 (load! "lisp/org-mini/org-mini")
+
+(setq org-mini-files org-agenda-files)
+
+(use-package! org-modern
+  :config
+  (add-hook 'org-mode-hook #'org-modern-mode)
+  (add-hook 'org-agenda-finalize-hook #'org-modern-agenda))
+
+(modify-all-frames-parameters
+ '((internal-border-width . 32)))
+
+(setq
+ ;; Edit settings
+ org-auto-align-tags nil
+ org-tags-column 0
+ org-fold-catch-invisible-edits 'show-and-error
+ org-special-ctrl-a/e t
+ org-insert-heading-respect-content t
+
+ ;; Org styling, hide markup etc.
+ org-hide-emphasis-markers t
+ org-pretty-entities t
+ org-ellipsis "…"
+
+ ;; Agenda styling
+ org-agenda-tags-column 0
+ org-agenda-block-separator ?─
+ org-agenda-time-grid
+ '((daily today require-timed)
+   (800 1000 1200 1400 1600 1800 2000)
+   " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+ org-agenda-current-time-string
+ "⭠ now ─────────────────────────────────────────────────")
