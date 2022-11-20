@@ -1,0 +1,994 @@
+#+title: Doom Emacs
+#+subtitle: Konfigurasi Instrumen Kiamat Saya.
+#+date: 20 November 2022
+#+description: Konfigurasi Instrumen Kiamat Saya.
+#+author: Fikri Rahmat Nurhidayat
+language: id
+
+* Prakata
+
+Seperti yang mungkin pembaca sudah ketahui, saya adalah seorang /programmer/. Dan sudah bisa dipastikan, pusaka utama saya adalah /Code Editor/ dimana pusaka ini akan saya gunakan dalam aktifitas menulis kode, mendokumentasikan kode dan sebagainya.
+
+Maka dari itu, saya benar-benar merawat, dan memodifikasi /code editor/ saya menjadi sangat personal dan sangat praktis untuk kebutuhan saya sehari-hari sebagai seorang /programmer/. Singkat cerita, saya akhirnya jatuh cinta dengan emacs karena saya melihat [[https://youtu.be/bEfYm8sAaQg][video dari SystemCrafters]] suatu hari dan terkesima dengan emacs yang secara konsep sederhana, namun tetap bisa terlihat elegan.
+
+Dan juga pada saat itu saya memerlukan alat untuk membantu saya dalam melakukan manajemen pekerjaan-pekerjaan saya yang masih semrawut pada saat itu. Disitulah saya juga menemukan emacs, karena emacs mempunyai fitur bernama =org-mode=, yang mana sangat berguna untuk melakukan manajemen pekerjaan, untuk menulis konten, melakukan literasi pemrograman, dan sebagainya.
+
+Dokumen ini akan selalu saya perbarui apabila ada konfigurasi baru yang saya tambahkan, dan tentu saja, dokumen ini akan menjadi /source code/ dari konfigurasi emacs saya karena saya menggunakan teknik pemrograman bernama /literate programming/.
+
+* Doom Emacs
+
+[[https://github.com/doomemacs/doomemacs/][Doom emacs]] adalah sebuah konfigurasi emacs, atau sebenarnya lebih ke kerangka kerja untuk memodifikasi emacs dengan konfigurasi bawaan yang mumpuni untuk kebutuhan pemrograman pada umumnya.
+
+Kenapa saya menggunakan doom emacs? Karena saya tidak mau repot mengonfigurasi emacs dari awal yang mana banyak sekali hal yang perlu disesuaikan. Dan juga, doom emacs seperti yang sudah disampaikan di muka, adalah sebuah kerangka kerja yang dapat membantu saya mengonfigurasi emacs agar menjadi seperti yang saya bayangkan.
+
+Doom emacs sendiri akan dipasang di dalam direktori =~/.emacs.d=, yang mana direktori itu adalah direktori yang digunakan untuk menyimpan konfigurasi emacs. Kita tidak akan menaruh konfigurasi pribadi kita di dalam direktori itu, melainkan kita akan menaruhnya di dalam direktori =~/.doom.d=.
+
+Konfigurasi pribadi doom emacs ini secara bawaan, terdiri dari 3 berkas, yaitu:
++ =init.el=: Berisi informasi terkait modul doom emacs mana saja yang ingin kita pakai.
++ =config.el=: Konfigurasi pribadi.
++ =packages.el=: Berisi /emacs package/ yang akan dipasang di dalam /emacs/, biasanya yang ditaruh di dalam berkas ini adalah /package/ yang tidak tersedia di dalam modul doom emacs.
+
+Dengan konfigurasi pribadi yang sudah diabstraksi oleh doom emacs, saya akhirnya dapat memodifikasi emacs dengan lebih mudah, dan lebih cepat, tanpa perlu risau terkait performa dan sebagainya.
+
+#+begin_src elisp :tangle init.el :noweb yes
+;;; init.el -*- lexical-binding: t; -*-
+
+(doom! :input
+       <<doom-input>>
+
+       :completion
+       <<doom-completion>>
+
+       :ui
+       <<doom-ui>>
+
+       :editor
+       <<doom-editor>>
+
+       :emacs
+       <<doom-emacs>>
+
+       :term
+       <<doom-term>>
+
+       :checkers
+       <<doom-checkers>>
+
+       :tools
+       <<doom-tools>>
+
+       :os
+       <<doom-os>>
+
+       :lang
+       <<doom-lang>>
+
+       :email
+       <<doom-email>>
+
+       :app
+       <<doom-app>>
+
+       :config
+       <<doom-config>>)
+#+end_src
+
+** Input
+
+Saya tidak tahu ini dipakai untuk apa, dan saya takut jika tidak memasukkan ini akan menyebabkan error.
+
+#+name: doom-input
+#+begin_src elisp
+;;bidi                 ; (tfel ot) thgir etirw uoy gnipleh
+;;chinese
+;;japanese
+;;layout               ; auie,ctsrnm is the superior home row
+#+end_src
+
+** Auto Completion
+
+Sudah sewajarnya seorang /programmer/ menggunakan /auto-completion/ untuk mempercepat proses penulisan kode dan lainnya, karena semakin cepat kita menulis kode, semakin cepat pula kita akan mendapat timbal balik dari apa yang kita tulis. Dan juga, saya tidak ingin menghafal semua kode yang saya tulis, jadi menggunakan /auto-completion/ adalah sebuah keharusan.
+
+Untuk /auto-completion/ sendiri saya menggunakan =company= karena katanya canggih, dan untuk mesin pencarinya sendiri saya menggunakan =vertico= karena katanya yang paling canggih dengan perfoma yang sangat cepat.
+
+#+name: doom-completion
+#+begin_src elisp
+company                 ; the ultimate code completion backend
+(vertico +icons)        ; the search engine of the future
+#+end_src
+
+** Antarmuka
+
+Seperti yang saya sebutkan di muka, saya menggunakan emacs karena emacs dapat dimodifikasi sedemikian rupa dengan fungsi-fungsi yang benar-benar canggih namun tetap bisa tampil elegan dari sisi antar muka. Maka dari itu, memodifikasi antar muka supaya emacs terlihat elegan itu begitu penting menurut saya.
+
+Untuk modul-modul antar muka doom emacs yang pantas saya sebutkan disini untuk menunjang keelokan antar muka emacs saya adalah =zen=, karena modul ini akan membantu saya mengonfigurasi =writeroom-mode= yang mana sangat berguna untuk mode menulis.
+
+#+name: doom-ui
+#+begin_src elisp
+deft                    ; notational velocity for Emacs
+doom                    ; what makes DOOM look the way it does
+hl-todo                 ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
+(ligatures +extra)      ; ligatures and symbols to make your code pretty again
+modeline                ; snazzy, Atom-inspired modeline, plus API
+ophints                 ; highlight the region an operation acts on
+(popup +defaults)       ; tame sudden yet inevitable temporary windows
+treemacs                ; a project drawer, like neotree but cooler
+unicode                 ; extended unicode support for various languages
+workspaces              ; tab emulation, persistence & separate workspaces
+zen                     ; distraction-free coding or writing
+#+end_src
+
+** Editor
+
+Modul-modul ini benar-benar menyelamatkan hidup saya. Disini saya memasang /evil/ supaya saya bisa menggunakan /vim keybinding/ karena /modal editing/ benar-benar superior.
+
+#+name: doom-editor
+#+begin_src elisp
+(evil +everywhere)      ; come to the dark side, we have cookies
+file-templates          ; auto-snippets for empty files
+fold                    ; (nigh) universal code folding
+(format +onsave)        ; automated prettiness
+lispy                   ; vim for lisp, for people who don't like vim
+snippets                ; my elves. They type so I don't have to
+#+end_src
+
+** Emacs
+
+Doom emacs juga menyediakan modul untuk memodifikasi aplikasi-aplikasi bawaan emacs.
+
+#+name: doom-emacs
+#+begin_src elisp
+dired                   ; making dired pretty [functional]
+undo                    ; persistent, smarter undo for your inevitable mistakes
+vc                      ; version-control and Emacs, sitting in a tree #+end_src
+#+end_src
+
+** Terminal
+
+Tentu saja, agar pemrograman dapat berjalan efektif, saya perlu terminal, karena dengan terminal, saya bisa melakukan banyak /scripting/ yang dapat membantu saya dalam melakukan hal-hal yang repetitif yang bisa saya otomasi dengan terminal.
+
+Untuk terminal sendiri, sebenarnya saya sering menggunakan =vterm=, tapi kali ini saya ingin menggunakan =eshell= sebagai terminal utama saya.
+
+#+name: doom-term
+#+begin_src elisp
+eshell                  ; the elisp shell that works everywhere
+#+end_src
+
+** Checkers
+
+Mendeteksi kesalahan sintaks lebih awal sangat membantu proses pemrograman. Karena saya tidak perlu melakukan kompilasi kode terlebih dahulu yang mana proses tersebut membutuhkan waktu. Artinya saya dapat menulis kode jauh lebih cepat tanpa harus mengulangi proses kompilasi berkali-kali.
+
+Doom emacs menggunakan /flycheck/ sepertinya.
+
+#+name: doom-checkers
+#+begin_src elisp
+syntax                  ; tasing you for every semicolon you forget
+#+end_src
+
+** Tools
+
+Banyak sekali /tools/ yang sangat sakti yang sebelumnya tidak pernah terpikirkan oleh saya. Ambil /magit/ sebagai contoh. Saya tidak pernah merasakan betapa mudahnya mengontrol git sebelumnya. Benar-benar /magit/.
+
+#+name: doom-tools
+#+begin_src elisp
+(eval +overlay)     ; run code, run (also, repls)
+gist                ; interacting with github gists
+lookup              ; navigate your code and its documentation
+lsp                 ; M-x vscode
+magit               ; a git porcelain for Emacs
+make                ; run make tasks from Emacs
+pass                ; password manager for nerds
+rgb                 ; creating color strings
+tree-sitter         ; syntax and parsing, sitting in a tree...
+#+end_src
+
+** OS
+
+Konfigurasi ini hanya placeholder saja, karena tidak terlalu berguna juga untuk saya karena saya tidak menggunakan emacs di MacOS maupun Terminal.
+
+#+name: doom-os
+#+begin_src elisp
+(:if IS-MAC macos)      ; improve compatibility with macOS
+;;tty                  ; improve the terminal Emacs experience
+#+end_src
+
+** Bahasa Pemrograman
+
+Karena saya tergolong poligot di dalam bahasa pemrograman, maka dari itu saya mengaktifkan banyak sekali modul terkait bahasa pemrograman di dalam doom emacs.
+
+#+name: doom-lang
+#+begin_src elisp
+(cc +lsp)               ; C > C++ == 1
+clojure                 ; java with a lisp
+common-lisp             ; if you've seen one lisp, you've seen them all
+data                    ; config/data formats
+(dart +flutter +lsp)    ; paint ui and not much else
+emacs-lisp              ; drown in parentheses
+(go +lsp)               ; the hipster dialect
+json                    ; At least it ain't XML
+(java +lsp)             ; the poster child for carpal tunnel syndrome
+javascript              ; all(hope(abandon(ye(who(enter(here))))))
+julia                   ; a better, faster MATLAB
+kotlin                  ; a better, slicker Java(Script)
+latex                   ; writing papers in Emacs has never been so fun
+lua                     ; one-based indices? one-based indices
+markdown                ; writing docs for people to ignore
+(org                    ; organize your plain life in plain text
++roam2                  ; whoa a second brain?
++appear                 ; reduce the unnecessary text
++present                ; present like a chad
++cliplink)              ; nuclear code
+racket                  ; a DSL for DSLs
+rest                    ; Emacs as a REST client
+(ruby +rails)           ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
+(rust +lsp)             ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+(scheme +guile)         ; a fully conniving family of lisps
+sh                      ; she sells {ba,z,fi}sh shells on the C xor
+yaml                    ; JSON, but readable
+#+end_src
+
+** Email
+
+Sebenarnya modul ini sangat menarik, tetapi saya tidak ingin menginvestasikan waktu saya pada saat ini untuk memakai modul ini, karena saya masih perlu bersih-bersih email saya.
+
+#+name: doom-email
+#+begin_src elisp
+;;notmuch
+;;(wanderlust +gmail)
+#+end_src
+
+** Aplikasi
+
+Ada beberapa aplikasi canggih yang populer di emacs, dan doom emacs sudah mengabstraksinya melalui modul =:app=.
+
+#+name: doom-app
+#+begin_src elisp
+;;calendar
+;;emms
+;;everywhere           ; *leave* Emacs!? You must be joking
+;;irc                  ; how neckbeards socialize
+;;(rss +org)           ; emacs as an RSS reader
+;;twitter              ; twitter client https://twitter.com/vnought
+#+end_src
+
+** Konfigurasi
+
+Modul ini sangat sederhana, cuma memberi dua opsi modul yang bisa diaktifkan, yaitu =literate= untuk menggunakan /literate configuration/ dan =(default +bindings)= yang mana sejujurnya saya tidak tau fungsinya apa.
+
+#+name: doom-config
+#+begin_src elisp
+;;literate
+(default +bindings)
+#+end_src
+
+* Pengaturan Umum
+
+Doom emacs memiliki beberapa variabel bawaan yang ditaruh oleh doom emacs sendiri setelah kita memasangnya. Variabel ini dapat saya sesuaikan dengan kebutuhkan saya.
+
+Seperti biasa, selalu tambahkan /string/ ajaib di baris pertama pada file, supaya performanya lebih cepat.
+
+#+name: config
+#+begin_src elisp :tangle ./config.el
+;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+#+end_src
+
+** Informasi Pribadi
+
+Saya perlu mengatur informasi pribadi saya ke dalam variabel yang sudah ditentukan oleh doom emacs. Informasi ini berguna untuk beberapa fungsi, seperti /GPG configuration/, /email client/, /file templates/ dan /snippets/.
+
+#+name: personal-information
+#+begin_src elisp :tangle ./config.el
+(setq user-full-name "Fikri Rahmat Nurhidayat"
+      user-mail-address "fikrirnurhidayat@gmail.com")
+#+end_src
+
+** Font
+
+Saya suka menggunakan font Iosevka, sayangnya font ini tidak terlalu cocok untuk digunakan di situs pribadi saya. Ya sudah akhirnya saya implementasikan disini saja.
+
+#+name: font
+#+begin_src elisp :tangle ./config.el
+(setq doom-font
+      (font-spec :family "Iosevka Fixed" :size 16)
+
+      doom-big-font
+      (font-spec :size 24)
+
+      doom-variable-pitch-font
+      (font-spec :family "Iosevka Aile" :size 16 :weight 'normal)
+
+      doom-unicode-font
+      (font-spec :family "JuliaMono")
+
+      doom-serif-font
+      (font-spec :family "Iosevka Etoile" :weight 'normal))
+#+end_src
+
+Dan juga saya perlu memodifikasi beberapa simbol yang ditampilkan oleh emacs, karena secara bawaan masih terlihat sedikit aneh bagi mata saya. Kode di bawah ini berfungsi untuk membuat simbol /comment/ dan /keyword/ di dalam emacs ditampilkan dengan huruf miring.
+
+#+name: custom-face
+#+begin_src elisp :tangle ./config.el
+(custom-set-faces!
+  '(font-lock-comment-face :slant italic)
+  '(font-lock-keyword-face :slant italic))
+#+end_src
+
+** Antarmuka
+
+Di dalam emacs, terdapat banyak konfigurasi terkait antarmuka, seperti /line numbers/, /themes/, /fringe/ dan sebagainya.
+
+*** Line Numbers
+
+Karena berlatarbelakang vim, maka dari itu akan sangat membantu jika saya menggunakan /relative line numbers/ dalam menggunakan editor ini.
+
+#+name: emacs-line-numbers
+#+begin_src elisp :tangle ./config.el
+(setq display-line-numbers-type 'relative)
+#+end_src
+
+*** Theme
+
+Karena sistem saya mayoritas menggunakan [[https://www.nordtheme.com/][nord]], sudah semestinya emacs saya juga mengikuti. Untungnya doom emacs datang dengan tema-tema kostum dari doom emacs sendiri.
+
+#+name: emacs-theme
+#+begin_src elisp :tangle ./config.el
+(setq doom-theme 'doom-nord-aurora)
+#+end_src
+
+*** Window
+
+Saya adalah seseorang yang tidak terlalu suka melihat sesuatu yang tidak begitu berguna di mata saya seperti /border/ untuk /window/ di dalam emacs.
+
+Dan juga, di dalam emacs, ada yang namanya fringe, yang mana adalah sebuah teks yang ditampilkan apabila ada baris yang terlalu panjang yang tidak bisa ditampilkan kalau /cursor/-nya tidak digeser. Ini menurut saya sangat mengganggu karena di dalam /vim/ saya tidak menemukannya.
+
+#+name: emacs-window
+#+begin_src elisp :tangle ./config.el
+(defun +doom-remove-annoying-visual ()
+  "Remove border, fringe, and so on."
+  (dolist (face '(window-divider
+                  window-divider-first-pixel
+                  window-divider-last-pixel
+                  fringe))
+    (custom-set-faces! `(,face :foreground ,(face-attribute 'default :background)))))
+
+;; TODO: Find what hook should we attach so this will always be properly executed
+(add-to-list 'doom-load-theme-hook '+doom-remove-annoying-visual)
+#+end_src
+
+*** Echo Area
+
+Dan juga, karena saya begitu mudah terdistraksi dengan pesan yang muncul di dalam /echo area/, maka dari itu lebih baik saya bisukan saja.
+
+#+name: emacs-echo-area
+#+begin_src elisp :tangle ./config.el
+(setq inhibit-message t
+      echo-keystores nil
+      message-log-max nil)
+#+end_src
+
+*** Modeline
+
+Karena saya menggunakan doom, tentu saja saya akan menggunakan /doom modeline/ secara bawaan. Namun ada beberapa hal yang perlu saya sesuaikan, mulai dari ukuran /modeline/-nya dan sebagainya.
+
+#+begin_src elisp :tangle ./config.el
+(use-package! doom-modeline
+  :config
+  (setq doom-modeline-height 48
+        doom-modeline-bar-width 8
+        doom-modeline-hud nil
+        doom-modeline-icon t
+        doom-modeline-window-width-limit nil
+        doom-modeline-major-mode-icon t
+        doom-modeline-number-limit 99
+        doom-modeline-lsp nil))
+#+end_src
+
+*** Lainnya
+
+Karena emacs itu isinya cuma emacs lisp saja mayoritas, maka menginstal =rainbow-mode= itu sangatlah berguna untuk memodifikasi kode lisp.
+
+#+begin_src elisp :tangle ./packages.el
+(package! rainbow-mode)
+#+end_src
+
+Dan juga, karena saya tidak suka kalau scratch buffer tidak menggunakan background yang sama, maka saya mematikan =solaire-mode=.
+
+#+begin_src elisp :tangle ./packages.el
+(package! solaire-mode :disable t)
+#+end_src
+
+** Pengaturan Sederhana
+
+Doom emacs punya banyak pengaturan bawaan yang canggih-canggih, saya cuma perlu melengkapinya saja.
+
+#+begin_src elisp :tangle ./config.el
+(setq evil-want-fine-undo t         ; Be more granular
+      auto-save-default t           ; Make sure your work is saved
+      truncate-string-ellipsis "…") ; Save some precious space
+#+end_src
+
+* Org Mode
+
+Org adalah sebuah mode di dalam emacs yang berfungsi untuk menerapkan /"Carsten's outline-mode for keeping track of everything."/. Di dalam emacs, banyak sekali fitur yang dapat digunakan ketika kita menggunakan =org-mode=. Salah satunya adalah manajemen tugas. Namun pada bagian ini saya hanya akan berfokus kepada kegunaan emacs dalam proses menulis saja.
+
+** /File/ dan Direktori
+
+Saya bisa memberi tahu emacs, dimana saya akan menyimpan file org saya di dalam komputer saya. Ini sebenarnya tidak terlalu penting, karena pada umumnya, saya hanya perlu memspesifikasikan lokasi file di dalam konfigurasi fitur org yang akan saya gunakan, seperti org agenda, dan org roam.
+
+#+begin_src elisp :tangle ./config.el
+(setq org-directory "/home/fain/Documents/org/")
+#+end_src
+
+** Pomodoro
+
+Saya mudah terdistraksi hal-hal sederhana, seperti notifikasi /handphone/, dan sebagainya. Ada satu teknik yang digunakan di luar sana untuk memaksa kita fokus dalam waktu 25 menit, teknik ini bernama pomodoro.
+
+Di dalam emacs, saya dapat menggunakan fitur pomodoro ini dengan memanggil fungsi =org-timer-set-timer=, yang mana kita akan ditanya terkait durasi dari /timer/ tersebut. Setelah /timer/ itu habis, emacs akan memutar suara yang saya tentukan sebagai notifikasi bahwa waktu sudah habis, seperti jam pomodoro pada umumnya.
+
+#+begin_src elisp :tangle ./config.el
+(setq org-clock-sound "/home/fain/Documents/bababooey.wav")
+#+end_src
+
+** Kenyamanan
+
+Kode dibawah ini berguna untuk mengatur /behaviour/ dari /org mode/ itu sendiri secara global. Saya malas mendokumentasikannya satu per satu, jadi sebaiknya dilihat langsung saja satu per satu menggunakan =SPC h v=.
+
+#+begin_src elisp :tangle ./config.el
+(setq org-use-property-inheritance t
+      org-log-done 'time
+      org-list-allow-alphabetical t
+      org-export-in-background t
+      org-fold-catch-invisible-edits 'smart)
+#+end_src
+
+** Tampilan
+
+Menurut saya, dengan tampilan minimalis dan tetap elegan di dalam /org mode/, akan membantu saya untuk tetap fokus melakukan apapun yang saya lakukan di dalam /org mode/. Mayoritas aktifitas saya di dalam /org mode/ adalah menulis.
+
+*** Tampilan Modern
+
+Untuk tampilan sendiri, saya menggunakan [[https://github.com/minad/org-modern][Modern Org Style]].
+
+#+name: package-org-modern
+#+begin_src elisp :tangle ./packages.el
+(package! org-modern)
+#+end_src
+
+Dan juga, karena tulisan saya punya tajuk yang semakin menjorok ke dalam, maka dari itu saya perlu modifikasi =org-modern-star=.
+
+#+begin_src elisp :tangle ./config.el
+(use-package! org-modern
+  :custom
+  (org-modern-star '("◉" "○" "◈" "◇" "◇"))
+  :config
+  (add-hook 'org-mode-hook #'org-modern-mode)
+  (add-hook 'org-agenda-finalize-hook #'org-modern-agenda))
+#+end_src
+
+*** Emphasis Tidak Terlihat
+
+Saya bisa menambahkan *bold*, /italic/, +strike-through+, dan sebagainya. Secara bawaan, ketika emacs menampilkan file org, di bagian emphasis, emacs akan menampilkan bungkus dari emphasis itu, sebagai contoh =*bold*=. Tampilan seperti itu mengganggu konsentrasi saya, karena terlalu banyak informasi yang ditampilkan secara literal, maka dari itu sebaiknya disembunyikan saja.
+
+#+begin_src elisp :tangle ./config.el
+(setq org-hide-emphasis-markers t)
+#+end_src
+
+Namun, konfigurasi itu membuat masalah baru, yaitu karakter pembungkus emphasis sama sekali tidak terlihat dan menyebabkan pengeditan bermasalah. Untungnya ada paket di luar sana yang menyelesaikan masalah ini, yaitu =org-appear=.
+
+#+name: package-org-appear
+#+begin_src elisp :tangle ./packages.el
+(package! org-appear)
+#+end_src
+
+Saya juga ingin =org-appear= dinyalakan setiap kali saya membuka file org.
+
+#+name: config-org-appear
+#+begin_src elisp :tangle ./config.el
+(use-package! org-appear
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autoemphasis t
+        org-appear-autosubmarkers t
+        org-appear-autolinks t)
+  ;; for proper first-time setup, `org-appear--set-elements'
+  ;; needs to be run after other hooks have acted.
+  (run-at-time nil nil #'org-appear--set-elements))
+#+end_src
+
+*** Lainnya
+
+Disini saya memodifikasi elipsis dan menyuruh emacs untuk menampilkan entitas dengan gaya.
+
+#+begin_src elisp :tangle ./config.el
+(setq org-pretty-entities t
+      org-ellipsis "…")
+#+end_src
+
+** Agenda
+
+Saya juga menggunakan =org-agenda= untuk mengatur agenda saya setiap hari. Org agenda ini saya pakai untuk mengimplementasikan GTD yang dicetuskan oleh David Allen.
+
+Pertama-tama, saya harus memberi tahu emacs dimana saya meletakkan file agenda saya. Pada dasarnya akan ada 3 file yang akan menjadi file agenda, yaitu:
++ =PROJECTS.org=
++ =NEXT.org=
++ =MAYBE.org=
+
+Kode dibawah ini saya gunakan untuk mengatur variabel =+org-agenda-directory= dan =org-agenda-files=:
+
+#+begin_src elisp :tangle ./config.el
+(setq +org-agenda-directory (concat org-directory "agenda/"))
+(setq org-agenda-files (mapcar (lambda (file)
+                                 (concat +org-agenda-directory file))
+                               '("INBOX.org" "PROJECTS.org" "NEXT.org" "MAYBE.org")))
+#+end_src
+
+*** Kata Kunci Status Pekerjaan
+
+Org agenda tidak akan berguna kalau tidak saya gunakan untuk melacak status dari sebuah pekerjaan. Untuk melacak status dari pekerjaan, intinya saya butuh 4 status, yaitu:
++ TODO: Sesuatu yang harus saya klarifikasi dan kerjakan.
++ WAIT: Sesuatu yang saya delegasikan ke orang lain.
++ HOLD: Sesuatu yang ditunda.
++ NEXT: Sesuatu yang harus saya segera lakukan ketika saya bisa.
++ VOID: Sesuatu yang dibatalkan.
++ DONE: Sesuatu yang sudah selesai.
+
+Kode di bawah ini berfungsi untuk mengatur kata kunci tersebut ke dalam agenda saya:
+
+#+begin_src elisp :tangle ./config.el
+(setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                          (sequence "WAIT(w@/!)" "HOLD(h@/!)" "|" "VOID(c@/!)")))
+#+end_src
+
+*** Refile
+
+Ketika saya mencatat semua hal yang perlu saya lakukan, tentu saja akan ada masa ketika saya harus mengklarifikasinya. Ketika saya klarifikasi agenda-agenda saya, saya perlu memindahkannya ke tempat yang layak. Sebagai contoh, ketika sesuatu yang harus saya lakukan ini adalah bagian dari sebuah proyek, maka agenda tersebut harus dipindahkan ke file =PROJECTS.org= sesuai dengan proyeknya.
+
+#+begin_src elisp :tangle ./config.el
+(setq org-refile-targets '(("PROJECTS.org" :maxlevel . 3)
+                             ("MAYBE.org" :level . 1)
+                             ("NEXT.org" :maxlevel . 2)))
+#+end_src
+
+*** Capture Template
+
+Saya perlu cara yang efektif untuk mencatat agenda-agenda saya yang datang baik itu melalui email, pesan di slack, dan sumber lainnya. Saya bisa menambahkan templat untuk mencatat informasi-informasi tersebut. Hal yang perlu saya lakukan adalah mengatur variabel =org-capture-templates=.
+
+#+begin_src elisp :noweb yes :tangle ./config.el
+(setq org-capture-templates '(<<inbox-capture-template>>
+                              <<website-capture-template>>))
+#+end_src
+
+**** Inbox
+
+Kotak masuk yang saya maksud disini adalah implementasi /Inbox/ yang didefinisikan di dalam GTD.
+
+#+name: inbox-capture-template
+#+begin_src elisp
+("i" "Inbox" entry (file "~/Documents/org/agenda/INBOX.org") "* TODO %i%?")
+#+end_src
+
+**** Website
+
+Terkadang saya ingin menandai sebuah situs di internet yang akan saya buka kalau saya ada waktu, atau saya kunjungi lagi ketika saya membutuhkan informasi di situs itu lagi.
+
+#+name: website-capture-template
+#+begin_src elisp
+("w" "Website" entry (file "~/Documents/org/agenda/INBOX.org")
+                               "* TODO [[%:link][%:description]]\n\n %i" :immediate-finish t)
+#+end_src
+
+*** Tampilan
+
+Secara bawaan, tampilan dari org agenda itu sangat sederhana. Saya mengambil /snippets/ ini dari dokumentasi =org-modern=, dan sejujurnya belum mencoba efeknya seperti apa.
+
+#+begin_src elisp :tangle ./config.el
+(setq org-agenda-tags-column 0
+      org-agenda-block-separator ?─
+      org-agenda-time-grid
+      '((daily today require-timed)
+        (800 1000 1200 1400 1600 1800 2000)
+        " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+      org-agenda-current-time-string
+      "⭠ now ─────────────────────────────────────────────────")
+#+end_src
+
+Kode di bawah ini saya contek dari [[https://blog.jethro.dev/posts/org_mode_workflow_preview/][tulisannya Jethro Kuan]], yang mana berfungsi untuk menentukan bagaimana agenda itu ditampilkan di dalam =org-agenda-view=.
+
+#+name: org-agenda-view
+#+begin_src elisp :noweb yes :tangle ./config.el
+(setq org-agenda-custom-commands
+      '(("o" "Agenda"
+         (
+          <<org-agenda-to-refile-section>>
+          <<org-agenda-in-progress-section>>
+          <<org-agenda-projects-section>>
+          <<org-agenda-one-off-tasks-section>>
+          )
+          nil)))
+#+end_src
+
+**** To Refile
+
+Bagian ini berfungsi untuk menampung semua kotak masuk.
+
+#+name: org-agenda-to-refile-section
+#+begin_src elisp
+(todo "TODO"
+      ((org-agenda-overriding-header "To Refile")
+       (org-agenda-files '("~/Documents/org/agenda/INBOX.org"))))
+#+end_src
+
+**** In Progress
+
+Bagian ini berfungsi untuk menampung semua item yang sedang dikerjakan/dilakukan.
+
+#+name: org-agenda-in-progress-section
+#+begin_src elisp
+(todo "NEXT"
+      ((org-agenda-overriding-header "In Progress")
+       (org-agenda-files '("~/Documents/org/agenda/PROJECTS.org"
+                           "~/Documents/org/agenda/MAYBE.org"
+                           "~/Documents/org/agenda/NEXT.org"))))
+#+end_src
+
+**** Projects
+
+Bagian ini berfungsi untuk menampung semua item yang di dalam sebuah proyek.
+
+#+name: org-agenda-projects-section
+#+begin_src elisp
+(todo "TODO"
+      ((org-agenda-overriding-header "Projects")
+       (org-agenda-files '("~/Documents/org/agenda/PROJECTS.org"))))
+#+end_src
+
+**** One-off Tasks
+
+Bagian ini berfungsi untuk menampung semua item yang di dalam sebuah proyek.
+
+#+name: org-agenda-one-off-tasks-section
+#+begin_src elisp
+(todo "TODO"
+      ((org-agenda-overriding-header "One-off Tasks")
+       (org-agenda-files '("~/Documents/org/agenda/NEXT.org"))
+       (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline 'scheduled))))
+#+end_src
+
+** Tulisan
+
+Seperti yang sudah saya sebutkan di muka, saya menggunakan org mode untuk menulis. Baik itu artikel, jurnal, bahkan konfigurasi emacs saya.
+
+Agar proses penulisan lebih menyenangkan, saya menggunakan modul =zen= dari doom emacs. Yang mana di dalam modul tersebut, doom emacs menggunakan =writeroom-mode=.
+
+Saya mencuri kode ini dari [[https://tecosaur.github.io/emacs-config/config.html][tecosaur]], yang mana disitu dia menambahkan hook ketika mengaktifkan writeroom dan menonaktifkannya.
+
+#+begin_src elisp :tangle ./config.el
+(after! writeroom-mode
+  (pushnew! writeroom--local-variables
+            'display-line-numbers
+            'visual-fill-column-width)
+  (add-hook 'writeroom-mode-enable-hook #'+zen-prose-org-h))
+  (add-hook 'writeroom-mode-disable-hook #'+zen-nonprose-org-h)
+#+end_src
+
+*** Ukuran Teks
+
+Selain itu, ketika saya mengaktifkan =writeroom-mode=, saya ingin teks yang ditampilkan lebih besar dari biasanya. Maka dari itu, saya menambahkan variabel baru yang berfungsi untuk mendefinisikan teks yang ditampilkan nanti akan diperbesar berapa kali.
+
+#+begin_src elisp :tangle ./config.el
+(defvar +zen-org-level-scale '((org-level-1 . 1.5)
+                               (org-level-2 . 1.25)
+                               (org-level-3 . 1.125)
+                               (org-level-4 . 1.0)
+                               (org-level-5 . 1.0)
+                               (org-level-6 . 1.0)
+                               (org-level-7 . 1.0)
+                               (org-level-8 . 1.0))
+  "Org level size remap.")
+#+end_src
+
+*** Prosa
+
+Saya tidak tahu kenapa tecosaur menyebutnya sebagai /prose/, tapi masuk akal juga kalo dinamakan prosa karena ini tentang keindahan.
+
+#+begin_src elisp :tangle ./config.el
+(defun +zen-prose-org-h ()
+  "Reformat the current Org buffer appearance for prose."
+  (when (eq major-mode 'org-mode)
+    (setq display-line-numbers nil
+          visual-fill-column-width 72
+          org-adapt-indentation nil)
+    (setq-local face-remapping-alist (mapcar (lambda (face) `(,(car face) (:height ,(cdr face))  ,(car face))) +zen-org-level-scale))
+    (setq +zen-text-scale 1.25
+          +zen--original-org-indent-mode-p org-indent-mode
+          +zen--original-org-pretty-table-mode-p (bound-and-true-p org-pretty-table-mode))))
+#+end_src
+
+*** Nonprosa
+
+Disini saya membuat fungsi yang mana adalah anti dari apa yang ktia lakukan di prosa tadi.
+
+#+begin_src elisp :tangle ./config.el
+(defun +zen-nonprose-org-h ()
+  "Reverse the effect of `+zen-prose-org'."
+  (when (eq major-mode 'org-mode)
+    (setq-local face-remapping-alist nil)))
+#+end_src
+
+** Presentasi
+
+Saya juga menggunakan emacs untuk presentasi apabila saya perlu mempresentasikannya di suatu rapat yang saya hadiri. Menggunakan emacs untuk presentasi ini sangat praktikal bagi saya. Karena saya menggunakan emacs untuk menuangkan ide-ide saya, dan ketika saya perlu mempresentasikan ide tersebut, saya tinggal buat struktur layaknya presentasi di dalam emacs juga.
+
+#+begin_src elisp :tangle ./packages.el
+(package! org-present)
+#+end_src
+
+Untuk konfigurasi presentasi sendiri saya menyontek dari [[https://youtu.be/SCPoF1PTZpI][video SystemCrafters]].
+
+#+begin_src elisp :tangle ./config.el
+(use-package! org-present
+  :hook ((org-present-mode . +org-present-hook)
+         (org-present-mode-quit . +org-present-quit-hook))
+  :init
+  (map! :leader :desc "Present" "t p" #'org-present)
+  (add-hook 'org-present-after-navigate-functions '+org-present-prepare-slide))
+#+end_src
+
+*** Prosedur Pengaktifan
+
+Ketika mode presentasi dinyalakan pada file org, saya melakukan beberapa penyesuaian sebelum akhirnya presentasi ini ditampilkan. Maka dari itu saya perlu menambahkan /hook/ ketika =org-present-mode= dipanggil.
+
+Masih ada beberapa hal yang perlu saya sesuaikan disini, sebagai contoh, saya perlu mendeteksi apakah saat ini dokumen yang saya buka ini sedang ditampilkan dalam mode penulisan atau tidak, dan sebagainya.
+
+#+begin_src elisp :tangle ./config.el
+(defun +org-present-hook ()
+  (when writeroom-mode (writeroom-mode 0))
+  (setq-local visual-fill-column-width 192
+              visual-fill-column-center-text t
+              header-line-format " "
+              face-remapping-alist '((default (:height 2.0) variable-pitch)
+                                     (header-line (:height 4.0) variable-pitch)
+                                     (org-document-title (:height 2.0) org-document-title)
+                                     (org-table (:height 0.5 :family "Iosevka") org-table)
+                                     (org-code (:height 1.0 :family "Iosevka") org-code)
+                                     (org-verbatim (:height 1.0 :family "Iosevka") org-verbatim)
+                                     (org-block (:height 1.0 :family "Iosevka") org-block)
+                                     (org-block-begin-line (:height 0.7) org-block-begin-line)
+                                     (org-block-end-line (:height 0.7) org-block-end-line)))
+  (display-line-numbers-mode 0)
+  (visual-fill-column-mode 1)
+  (visual-line-mode 1)
+  (hide-mode-line-mode 1)
+  (org-display-inline-images))
+#+end_src
+
+*** Prosedur Penonaktifan
+
+Sama seperti mode penulisan tadi, ketika saya menonaktifkan mode presentasi, saya perlu mengembalikan apa saja yang saya rubah ketika mengaktifkan mode presentasi ke bentuk aslinya.
+
+#+begin_src elisp :tangle ./config.el
+(defun +org-present-quit-hook ()
+  (setq-local face-remapping-alist '((default variable-pitch default)))
+  (setq header-line-format nil)
+  (org-present-small)
+  (visual-fill-column-mode 0)
+  (org-indent-mode 1)
+  (hide-mode-line-mode 0)
+  (org-superstar-restart)
+  (org-mode-restart)
+  (org-remove-inline-images))
+#+end_src
+
+*** Prosedur Perpindahan /Slide/
+
+Setiap kali saya melakukan perpindahan slide di dalam /org present/, /org present/ akan selalu mengatur ulang tampilan /slide/ menggunakan konfigurasi bawaannya. Karena gaya saya dalam menampilkan /slide/ selalu sama, dan kebetulan berbeda dengan bawaannya /org present/, maka dari itu saya perlu menambahkan fungsi yang akan selalu dieskekusi ketika saya memindah slide di dalam /org present/.
+
+#+begin_src elisp :tangle ./config.el
+(defun +org-present-prepare-slide (buffer-name heading)
+  (org-overview)
+  (org-fold-show-entry)
+  (org-fold-show-children))
+#+end_src
+
+** Roam
+
+Roam adalah sebuah aplikasi yang mengimplementasikan metode Zettelkasten. Karena Roam ini mahal, maka seorang mahasiswa dari Universitas Nasional Singapura membuat /package/ yang mengimplementasikan fitur-fitur dari Roam ke dalam emacs. Mahasiswa tersebut bernama [[https://www.jethro.dev/][Jethro Kuan]].
+
+Saya sendiri tertarik untuk menggunakan /package/ ini, karena menurut saya, /package/ ini akan sangat membantu saya dalam menuangkan ide-ide, atau informasi yang saya dapatkan dari berbagai sumber. Dan juga, saya sangat tertarik untuk mengimplementasikan metode Zettelkasten di dalam hidup saya.
+
+Untuk konfigurasi terkait Org Roam sendiri tidak terlalu rumit, saya hanya perlu menambahkan deklarasi /use package/ dan menambahkan =org-roam= sebagai dependensi di dalam emacs saya.
+
+Oh iya, saya menggunakan =org-roam-ui= untuk memvisualisasikan catatan-catatan saya di dalam /slip-box/ saya. Dan instalasi di bawah ini saya ambil langsung dari dokumentasi [[https://github.com/org-roam/org-roam-ui#doom][org-roam-ui]].
+
+#+begin_src elisp :tangle ./packages.el
+(unpin! org-roam)
+(package! org-roam-ui)
+#+end_src
+
+*** Konfigurasi Org Roam
+
+Yang perlu saya konfigurasi di dalam org roam hanya beberapa variabel saja, karena sejujurnya fitur dari /package/ ini sudah sangat memadai untuk kebutuhan saya. Variabel yang perlu sesuaikan hanyalah variabel yang menentukan dimana org roam harus meletakkan, dan mencari file-file saya terkait org roam, yang biasa disebut sebagai /slip-box/. Di dalam konfigurasi ini juga, saya perlu mendeklarasikan bahwa saya menggunakan [[https://blog.jethro.dev/posts/org_roam_v2/][org roam versi 2]].
+
+#+begin_src elisp :tangle ./config.el
+(use-package! org-roam
+  :init
+  (setq org-roam-v2-ack t)
+  :custom
+  (org-roam-directory (concat org-directory "roams/"))
+  (org-roam-capture-templates
+   '(("d" "Default" plain
+      "%?"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+      :unnarrowed t)))
+  (org-roam-complete-everywhere t))
+#+end_src
+
+*** Konfigurasi Org Roam UI
+
+Seperti yang sudah saya sebut di muka tadi, org roam ui ini berfungsi untuk memvisualisasi catatan-catatan yang ada di dalam /slip-box/ saya.
+
+#+begin_src elisp :tangle ./config.el
+(use-package! websocket
+  :after org-roam)
+
+(use-package! org-roam-ui
+    :after org-roam
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+#+end_src
+
+* Pemrograman
+
+Untuk pemrograman sendiri, saya tidak perlu melakukan konfigurasi yang rumit karena /doom emacs/ sendiri sudah mengabstraksi semuanya. Pada bagian ini, saya hanya akan menjabarkan terkait /tools/ yang saya gunakan dalam pemrograman di emacs, yaitu terminal, dan manajemen proyeknya.
+
+** Terminal
+
+#+begin_src elisp :tangle ./config.el
+(load-file (concat doom-user-dir "fain-eshell.el"))
+#+end_src
+
+Untuk terminal sendiri saya menggunakan =eshell=. Terminal ini bisa saya katakan unik, karena terminal ini dapat mengevaluasi ekspresi elisp. Dan juga, terminal ini bisa dikatakan jauh lebih cepat dibandingkan shell dan term. Maka dari itu, menggunakan terminal ini adalah suatu opsi yang bijak.
+
+#+begin_src elisp :tangle ./packages.el
+(package! xterm-color)
+#+end_src
+
+Tentu saja, ada opsi lain yang tidak kalah bagus, yaitu =vterm=. Saya sendiri sudah menggunakan =vterm=. Namun saya ingin mencoba untuk menggunakan =eshell= sebagai terminal utama saya.
+
+Konfigurasi terminal ini saya curi juga dari [[https://github.com/daviwil/dotfiles/blob/master/Emacs.org#eshell][Daviwil]].
+
+#+begin_src elisp :tangle ./fain-eshell.el
+;;; fain-eshell.el -*- lexical-binding: t; -*-
+(defun read-file (file-path)
+  "Read file with temporary buffer."
+  (with-temp-buffer
+    (insert-file-contents file-path)
+    (buffer-string)))
+
+(defun +eshell-configure ()
+  (evil-collection-eshell-setup)
+  (push 'eshell-tramp eshell-modules-list)
+  (push 'xterm-color-filter eshell-preoutput-filter-functions)
+  (delq 'eshell-handle-ansi-color eshell-output-filter-functions)
+
+  ;; Save command history when commands are entered
+  (add-hook 'eshell-pre-command-hook 'eshell-save-some-history)
+
+  (add-hook 'eshell-before-prompt-hook
+            (lambda ()
+              (setq xterm-color-preserve-properties t)))
+
+  ;; Truncate buffer for performance
+  (add-to-list 'eshell-output-filter-functions 'eshell-truncate-buffer)
+
+  ;; We want to use xterm-256color when running interactive commands
+  ;; in eshell but not during other times when we might be launching
+  ;; a shell command to gather its output.
+  (add-hook 'eshell-pre-command-hook
+            (lambda () (setenv "TERM" "xterm-256color")))
+  (add-hook 'eshell-post-command-hook
+            (lambda () (setenv "TERM" "dumb")))
+
+  ;; Use completion-at-point to provide completions in eshell
+  (define-key eshell-mode-map (kbd "<tab>") 'completion-at-point)
+
+  ;; Initialize the shell history
+  (eshell-hist-initialize)
+
+  (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'consult-history)
+  (evil-define-key '(normal insert visual) eshell-mode-map (kbd "<home>") 'eshell-bol)
+  (evil-normalize-keymaps)
+
+  (setenv "PAGER" "cat")
+
+  (setq eshell-prompt-function      '+eshell-prompt
+        eshell-prompt-regexp        "^λ "
+        eshell-history-size         10000
+        eshell-buffer-maximum-lines 10000
+        eshell-hist-ignoredups t
+        eshell-highlight-prompt t
+        eshell-scroll-to-bottom-on-input t
+        eshell-prefer-lisp-functions nil))
+
+(add-hook 'eshell-first-time-mode-hook #'+eshell-configure)
+(setq eshell-directory-name "~/.cache/eshell/"
+      eshell-aliases-file (expand-file-name "~/.cache/eshell/alias"))
+#+end_src
+
+
+/Prompt/ ini benar-benar mencuri dari Daviwil.
+
+#+begin_src elisp :tangle ./fain-eshell.el
+(defun +eshell-prompt ()
+  (let ((current-branch (magit-get-current-branch)))
+    (concat
+     "\n"
+     (propertize (system-name) 'face `(:foreground ,(doom-color 'magenta)))
+     (propertize " • " 'face `(:foreground ,(doom-color 'fg)))
+     (propertize (+get-prompt-path) 'face `(:foreground ,(doom-color 'cyan)))
+     (when current-branch
+       (concat
+        (propertize " • " 'face `(:foreground ,(doom-color 'fg)))
+        (propertize (concat " " current-branch) 'face `(:foreground ,(doom-color 'red)))))
+     (propertize " • " 'face `(:foreground ,(doom-color 'fg)))
+     (propertize (format-time-string "%I:%M:%S %p") 'face `(:foreground ,(doom-color 'base4)))
+     (if (= (user-uid) 0)
+         (propertize "\n#" 'face `(:foreground ,(doom-color 'success)))
+       (propertize "\nλ" 'face `(:foreground ,(doom-color 'success))))
+     (propertize " " 'face `(:foreground ,(doom-color 'fg))))))
+#+end_src
+
+**** Prompt Path
+
+Prompt ini berfungsi untuk menampilkan saya sekarang ada di mana di dalam terminal. Hanya nama direktori saja yang akan ditampilkan.
+
+#+begin_src elisp :tangle ./fain-eshell.el
+(defun +get-prompt-path ()
+  (let* ((current-path (eshell/pwd))
+         (git-output (shell-command-to-string "git rev-parse --show-toplevel"))
+         (has-path (not (string-match "^fatal" git-output))))
+    (if (not has-path)
+        (abbreviate-file-name current-path)
+      (string-remove-prefix (file-name-directory git-output) current-path))))
+#+end_src
+
+**** Git Status Prompt
+
+Prompt ini berguna untuk memberi tahu saya, saya sedang di /branch/ apa di dalam repository git. Namun ada kemungkinan saya akan nonaktifkan fitur ini dikarenakan ada beberapa repository yang benar-benar berat untuk dimuat.
+
+#+begin_src elisp :tangle ./fain-eshell.el
+(defun +map-line-to-status-char (line)
+  (cond ((string-match "^?\\? " line) "?")))
+
+(defun +get-git-status-prompt ()
+  (let ((status-lines (cdr (process-lines "git" "status" "--porcelain" "-b"))))
+    (seq-uniq (seq-filter 'identity (mapcar '+map-line-to-status-char status-lines)))))
+#+end_src
+
+** Projectile
+
+/Projectile/ adalah sebuah /package/ yang membantu saya untuk berpindah-pindah proyek di dalam emacs. Disini saya hanya perlu memberitahu dimana direktori proyek saya.
+
+#+begin_src elisp :tangle ./config.el
+(use-package! projectile
+  :init
+  (when (and (file-directory-p "~/Works/Repositories") (file-directory-p "~/Repositories"))
+    (setq projectile-project-search-path '("~/Work/Repositories" "~/Repositories"))))
+#+end_src
+
+** Ripgrep
+
+Ripgrep adalah sebuah biner yang berfungsi layaknya /grep/, bedanya /ripgrep/ jauh lebih cepat karena ditulis menggunakan /rust/. Dan juga, /ripgrep/ ini sudah terintegrasi dengan projectile.
+
+#+begin_src elisp :tangle ./packages.el
+(package! ripgrep)
+#+end_src
+
+** Protobuf
+
+#+begin_src elisp :tangle ./packages.el
+(package! protobuf-mode)
+#+end_src
