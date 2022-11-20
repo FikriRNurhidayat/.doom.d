@@ -4,13 +4,13 @@
       user-mail-address "fikrirnurhidayat@gmail.com")
 
 (setq doom-font
-      (font-spec :family "Iosevka Fixed" :size 16)
+      (font-spec :family "Iosevka Fixed" :size 20)
 
       doom-big-font
-      (font-spec :size 24)
+      (font-spec :size 32)
 
       doom-variable-pitch-font
-      (font-spec :family "Iosevka Aile" :size 16 :weight 'normal)
+      (font-spec :family "Iosevka Aile" :size 20 :weight 'normal)
 
       doom-unicode-font
       (font-spec :family "JuliaMono")
@@ -52,6 +52,8 @@
         doom-modeline-number-limit 99
         doom-modeline-lsp nil))
 
+(after! doom (custom-set-faces! `(mode-line :background ,(face-attribute 'default :background))))
+
 (setq evil-want-fine-undo t         ; Be more granular
       auto-save-default t           ; Make sure your work is saved
       truncate-string-ellipsis "…") ; Save some precious space
@@ -65,6 +67,8 @@
       org-list-allow-alphabetical t
       org-export-in-background t
       org-fold-catch-invisible-edits 'smart)
+
+(add-hook 'org-mode-hook (lambda () (display-line-numbers-mode 0)))
 
 (use-package! org-modern
   :custom
@@ -154,17 +158,17 @@
 (defun +zen-prose-org-h ()
   "Reformat the current Org buffer appearance for prose."
   (when (eq major-mode 'org-mode)
-    (setq display-line-numbers nil
-          visual-fill-column-width 72
-          org-adapt-indentation nil)
-    (setq-local face-remapping-alist (mapcar (lambda (face) `(,(car face) (:height ,(cdr face))  ,(car face))) +zen-org-level-scale))
-    (setq +zen-text-scale 1.25
-          +zen--original-org-indent-mode-p org-indent-mode
-          +zen--original-org-pretty-table-mode-p (bound-and-true-p org-pretty-table-mode))))
+    (setq visual-fill-column-width 64
+          org-adapt-indentation t
+          +zen-text-scale 1.25)
+    (org-indent-mode 0)
+    (setq-local face-remapping-alist (mapcar (lambda (face) `(,(car face) (:height ,(cdr face))  ,(car face))) +zen-org-level-scale))))
 
 (defun +zen-nonprose-org-h ()
   "Reverse the effect of `+zen-prose-org'."
   (when (eq major-mode 'org-mode)
+    (org-indent-mode 1)
+    (setq org-adapt-indentation nil)
     (setq-local face-remapping-alist nil)))
 
 (use-package! org-present

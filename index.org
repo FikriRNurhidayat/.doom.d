@@ -289,13 +289,13 @@ Saya suka menggunakan font Iosevka, sayangnya font ini tidak terlalu cocok untuk
 #+name: font
 #+begin_src elisp :tangle ./config.el
 (setq doom-font
-      (font-spec :family "Iosevka Fixed" :size 16)
+      (font-spec :family "Iosevka Fixed" :size 20)
 
       doom-big-font
-      (font-spec :size 24)
+      (font-spec :size 32)
 
       doom-variable-pitch-font
-      (font-spec :family "Iosevka Aile" :size 16 :weight 'normal)
+      (font-spec :family "Iosevka Aile" :size 20 :weight 'normal)
 
       doom-unicode-font
       (font-spec :family "JuliaMono")
@@ -383,6 +383,12 @@ Karena saya menggunakan doom, tentu saja saya akan menggunakan /doom modeline/ s
         doom-modeline-lsp nil))
 #+end_src
 
+Dan juga saya tidak terlalu senang apabila modeline diberi warna latar belakang, jadi saya samakan saja dengan latar belakang emacs saya.
+
+#+begin_src elisp :tangle ./config.el
+(after! doom (custom-set-faces! `(mode-line :background ,(face-attribute 'default :background))))
+#+end_src
+
 *** Lainnya
 
 Karena emacs itu isinya cuma emacs lisp saja mayoritas, maka menginstal =rainbow-mode= itu sangatlah berguna untuk memodifikasi kode lisp.
@@ -444,6 +450,14 @@ Kode dibawah ini berguna untuk mengatur /behaviour/ dari /org mode/ itu sendiri 
 ** Tampilan
 
 Menurut saya, dengan tampilan minimalis dan tetap elegan di dalam /org mode/, akan membantu saya untuk tetap fokus melakukan apapun yang saya lakukan di dalam /org mode/. Mayoritas aktifitas saya di dalam /org mode/ adalah menulis.
+
+*** Sembunyikan /Line Number/
+
+Karena org mode ini dipakai untuk menulis, menurut saya informasi /line numbers/ ini sangat tidak berguna. Jadi lebih baik kita sembunyikan saja.
+
+#+begin_src elisp :tangle ./config.el
+(add-hook 'org-mode-hook (lambda () (display-line-numbers-mode 0)))
+#+end_src
 
 *** Tampilan Modern
 
@@ -695,13 +709,11 @@ Saya tidak tahu kenapa tecosaur menyebutnya sebagai /prose/, tapi masuk akal jug
 (defun +zen-prose-org-h ()
   "Reformat the current Org buffer appearance for prose."
   (when (eq major-mode 'org-mode)
-    (setq display-line-numbers nil
-          visual-fill-column-width 72
-          org-adapt-indentation nil)
-    (setq-local face-remapping-alist (mapcar (lambda (face) `(,(car face) (:height ,(cdr face))  ,(car face))) +zen-org-level-scale))
-    (setq +zen-text-scale 1.25
-          +zen--original-org-indent-mode-p org-indent-mode
-          +zen--original-org-pretty-table-mode-p (bound-and-true-p org-pretty-table-mode))))
+    (setq visual-fill-column-width 64
+          org-adapt-indentation t
+          +zen-text-scale 1.25)
+    (org-indent-mode 0)
+    (setq-local face-remapping-alist (mapcar (lambda (face) `(,(car face) (:height ,(cdr face))  ,(car face))) +zen-org-level-scale))))
 #+end_src
 
 *** Nonprosa
@@ -712,6 +724,8 @@ Disini saya membuat fungsi yang mana adalah anti dari apa yang ktia lakukan di p
 (defun +zen-nonprose-org-h ()
   "Reverse the effect of `+zen-prose-org'."
   (when (eq major-mode 'org-mode)
+    (org-indent-mode 1)
+    (setq org-adapt-indentation nil)
     (setq-local face-remapping-alist nil)))
 #+end_src
 
