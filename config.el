@@ -4,13 +4,13 @@
       user-mail-address "fikrirnurhidayat@gmail.com")
 
 (setq doom-font
-      (font-spec :family "Iosevka Fixed" :size 20)
+      (font-spec :family "Iosevka Fixed" :size 16)
 
       doom-big-font
       (font-spec :size 32)
 
       doom-variable-pitch-font
-      (font-spec :family "Iosevka Aile" :size 20 :weight 'normal)
+      (font-spec :family "Iosevka Aile" :size 16 :weight 'normal)
 
       doom-unicode-font
       (font-spec :family "JuliaMono")
@@ -37,9 +37,9 @@
 ;; TODO: Find what hook should we attach so this will always be properly executed
 (add-to-list 'doom-load-theme-hook '+doom-remove-annoying-visual)
 
-(setq inhibit-message t
-      echo-keystores nil
-      message-log-max nil)
+(setq inhibit-message nil
+      echo-keystores t
+      message-log-max 100)
 
 (use-package! doom-modeline
   :config
@@ -52,7 +52,11 @@
         doom-modeline-number-limit 99
         doom-modeline-lsp nil))
 
-(after! doom (custom-set-faces! `(mode-line :background ,(face-attribute 'default :background))))
+(after! doom (custom-set-faces!
+               `(mode-line :background ,(face-attribute 'default :background))
+               `(mode-line-inactive :background ,(face-attribute 'default :background))
+               `(doom-modeline-bar :background ,(face-attribute 'default :background))
+               `(doom-modeline-bar-inactive :background ,(face-attribute 'default :background))))
 
 (setq evil-want-fine-undo t         ; Be more granular
       auto-save-default t           ; Make sure your work is saved
@@ -64,6 +68,7 @@
 
 (setq org-use-property-inheritance t
       org-log-done 'time
+      org-startup-indented nil
       org-list-allow-alphabetical t
       org-export-in-background t
       org-fold-catch-invisible-edits 'smart)
@@ -72,10 +77,11 @@
 
 (use-package! org-modern
   :custom
-  (org-modern-star '("◉" "○" "◈" "◇" "◇"))
+  (org-modern-star '("◈" "◇" "◈" "◇" "◈" "◇" "◈" "◇"))
+  (org-modern-hide-stars 'leading)
+  (org-modern-block-fringe nil)
   :config
-  (add-hook 'org-mode-hook #'org-modern-mode)
-  (add-hook 'org-agenda-finalize-hook #'org-modern-agenda))
+  (global-org-modern-mode))
 
 (setq org-hide-emphasis-markers t)
 
@@ -84,7 +90,7 @@
   :config
   (setq org-appear-autoemphasis t
         org-appear-autosubmarkers t
-        org-appear-autolinks t)
+        org-appear-autolinks nil)
   ;; for proper first-time setup, `org-appear--set-elements'
   ;; needs to be run after other hooks have acted.
   (run-at-time nil nil #'org-appear--set-elements))
@@ -159,16 +165,22 @@
   "Reformat the current Org buffer appearance for prose."
   (when (eq major-mode 'org-mode)
     (setq visual-fill-column-width 64
-          org-adapt-indentation t
-          +zen-text-scale 1.25)
+          org-adapt-indentation nil
+          org-modern-hide-stars t
+          +zen-text-scale 1.0)
+    (org-modern-mode 0)
     (org-indent-mode 0)
+    (org-modern-mode 1)
     (setq-local face-remapping-alist (mapcar (lambda (face) `(,(car face) (:height ,(cdr face))  ,(car face))) +zen-org-level-scale))))
 
 (defun +zen-nonprose-org-h ()
   "Reverse the effect of `+zen-prose-org'."
   (when (eq major-mode 'org-mode)
+    (setq org-adapt-indentation nil
+          org-modern-hide-stars 'leading)
+    (org-modern-mode 0)
     (org-indent-mode 1)
-    (setq org-adapt-indentation nil)
+    (org-modern-mode 1)
     (setq-local face-remapping-alist nil)))
 
 (use-package! org-present
