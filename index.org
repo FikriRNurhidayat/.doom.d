@@ -3,7 +3,7 @@
 #+date: 20 November 2022
 #+description: Konfigurasi Instrumen Kiamat Saya.
 #+author: Fikri Rahmat Nurhidayat
-language: id
+#+language: id
 
 * Prakata
 
