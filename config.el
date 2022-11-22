@@ -62,13 +62,27 @@
       auto-save-default t           ; Make sure your work is saved
       truncate-string-ellipsis "…") ; Save some precious space
 
+(use-package! deft
+  :init
+  (setq deft-directory "/home/fain/Documents/notes/"
+        deft-recursive t
+        deft-file-naming-rules '((noslash . "-") (nospace . "-") (case-fn . downcase))
+        deft-strip-title-regexp "\\(?:^%+\\|^#\\+title: *\\|^[#* ]+\\|-\\*-[[:alpha:]]+-\\*-\\|^Title:[	 ]*\\|#+$\\)"
+        deft-open-file-hook '+deft-open-file-hook))
+
+(load-file (concat doom-user-dir "lisp/fain-org-note.el"))
+
+(defun +deft-open-file-hook ()
+  (when (eq major-mode 'org-mode)
+    (fain-org-note-mode 1)))
+
 (setq org-directory "/home/fain/Documents/org/")
 
 (setq org-clock-sound "/home/fain/Documents/bababooey.wav")
 
 (setq org-use-property-inheritance t
       org-log-done 'time
-      org-startup-indented nil
+      org-startup-indented t
       org-list-allow-alphabetical t
       org-export-in-background t
       org-fold-catch-invisible-edits 'smart)
@@ -249,7 +263,7 @@
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
 
-(load-file (concat doom-user-dir "fain-eshell.el"))
+(load-file (concat doom-user-dir "lisp/fain-eshell.el"))
 
 (use-package! projectile
   :init

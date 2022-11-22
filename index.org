@@ -416,6 +416,64 @@ Doom emacs punya banyak pengaturan bawaan yang canggih-canggih, saya cuma perlu 
       truncate-string-ellipsis "…") ; Save some precious space
 #+end_src
 
+* Pencatatan
+
+Untuk pencatatan sendiri saya menggunakan =deft=. Tidak tahu kenapa, tapi saya baru mencobanya saat ini.
+
+#+begin_src elisp :tangle ./config.el
+(use-package! deft
+  :init
+  (setq deft-directory "/home/fain/Documents/notes/"
+        deft-recursive t
+        deft-file-naming-rules '((noslash . "-") (nospace . "-") (case-fn . downcase))
+        deft-strip-title-regexp "\\(?:^%+\\|^#\\+title: *\\|^[#* ]+\\|-\\*-[[:alpha:]]+-\\*-\\|^Title:[	 ]*\\|#+$\\)"
+        deft-open-file-hook '+deft-open-file-hook))
+#+end_src
+
+** Mode Pencatatan
+
+Saya tidak terlalu suka juga dengan tampilan bawaan ketika saya membuka catatan. Catatan seharusnya terlihat sederhana dan tidak terlalu ribet, jadi saya membuat mode baru.
+
+#+begin_src elisp :tangle ./lisp/fain-org-note.el
+;;; fain-org-note.el --- Make org more like note -*- lexical-binding: t; -*-
+(require 'org)
+(require 'mixed-pitch)
+(require 'visual-fill-column)
+
+(define-minor-mode fain-org-note-mode
+  "Toggle fain-org-note-mode and display org mode as note."
+  :lighter "fain-org-note"
+  (if fain-org-note-mode
+      (progn
+        (setq-local visual-fill-column-width 96
+                    visual-fill-column-center-text t)
+        (mixed-pitch-mode 1)
+        (visual-fill-column-mode 1))
+    (progn
+      (setq-local visual-fill-column-width nil)
+      (mixed-pitch-mode 0)
+      (visual-fill-column-mode 0))))
+
+(provide 'fain-org-note)
+#+end_src
+
+
+Lalu, muat file tersebut ketika membuka doom emacs.
+
+#+begin_src elisp :tangle ./config.el
+(load-file (concat doom-user-dir "lisp/fain-org-note.el"))
+#+end_src
+
+** Otomatis Mengaktifkan Mode Pencatatan
+
+Mode tersebut akan diaktifkan ketika kita membuka catatan melalui deft.
+
+#+begin_src elisp :tangle ./config.el
+(defun +deft-open-file-hook ()
+  (when (eq major-mode 'org-mode)
+    (fain-org-note-mode 1)))
+#+end_src
+
 * Org Mode
 
 Org adalah sebuah mode di dalam emacs yang berfungsi untuk menerapkan /"Carsten's outline-mode for keeping track of everything."/. Di dalam emacs, banyak sekali fitur yang dapat digunakan ketika kita menggunakan =org-mode=. Salah satunya adalah manajemen tugas. Namun pada bagian ini saya hanya akan berfokus kepada kegunaan emacs dalam proses menulis saja.
@@ -445,7 +503,7 @@ Kode dibawah ini berguna untuk mengatur /behaviour/ dari /org mode/ itu sendiri 
 #+begin_src elisp :tangle ./config.el
 (setq org-use-property-inheritance t
       org-log-done 'time
-      org-startup-indented nil
+      org-startup-indented t
       org-list-allow-alphabetical t
       org-export-in-background t
       org-fold-catch-invisible-edits 'smart)
@@ -872,7 +930,7 @@ Untuk pemrograman sendiri, saya tidak perlu melakukan konfigurasi yang rumit kar
 ** Terminal
 
 #+begin_src elisp :tangle ./config.el
-(load-file (concat doom-user-dir "fain-eshell.el"))
+(load-file (concat doom-user-dir "lisp/fain-eshell.el"))
 #+end_src
 
 Untuk terminal sendiri saya menggunakan =eshell=. Terminal ini bisa saya katakan unik, karena terminal ini dapat mengevaluasi ekspresi elisp. Dan juga, terminal ini bisa dikatakan jauh lebih cepat dibandingkan shell dan term. Maka dari itu, menggunakan terminal ini adalah suatu opsi yang bijak.
@@ -885,8 +943,8 @@ Tentu saja, ada opsi lain yang tidak kalah bagus, yaitu =vterm=. Saya sendiri su
 
 Konfigurasi terminal ini saya curi juga dari [[https://github.com/daviwil/dotfiles/blob/master/Emacs.org#eshell][Daviwil]].
 
-#+begin_src elisp :tangle ./fain-eshell.el
-;;; fain-eshell.el -*- lexical-binding: t; -*-
+#+begin_src elisp :tangle ./lisp/fain-eshell.el
+;;; $DOOMDIR/lisp/fain-eshell.el -*- lexical-binding: t; -*-
 (defun read-file (file-path)
   "Read file with temporary buffer."
   (with-temp-buffer
@@ -946,7 +1004,7 @@ Konfigurasi terminal ini saya curi juga dari [[https://github.com/daviwil/dotfil
 
 /Prompt/ ini benar-benar mencuri dari Daviwil.
 
-#+begin_src elisp :tangle ./fain-eshell.el
+#+begin_src elisp :tangle ./lisp/fain-eshell.el
 (defun +eshell-prompt ()
   (let ((current-branch (magit-get-current-branch)))
     (concat
@@ -970,7 +1028,7 @@ Konfigurasi terminal ini saya curi juga dari [[https://github.com/daviwil/dotfil
 
 Prompt ini berfungsi untuk menampilkan saya sekarang ada di mana di dalam terminal. Hanya nama direktori saja yang akan ditampilkan.
 
-#+begin_src elisp :tangle ./fain-eshell.el
+#+begin_src elisp :tangle ./lisp/fain-eshell.el
 (defun +get-prompt-path ()
   (let* ((current-path (eshell/pwd))
          (git-output (shell-command-to-string "git rev-parse --show-toplevel"))
@@ -984,7 +1042,7 @@ Prompt ini berfungsi untuk menampilkan saya sekarang ada di mana di dalam termin
 
 Prompt ini berguna untuk memberi tahu saya, saya sedang di /branch/ apa di dalam repository git. Namun ada kemungkinan saya akan nonaktifkan fitur ini dikarenakan ada beberapa repository yang benar-benar berat untuk dimuat.
 
-#+begin_src elisp :tangle ./fain-eshell.el
+#+begin_src elisp :tangle ./lisp/fain-eshell.el
 (defun +map-line-to-status-char (line)
   (cond ((string-match "^?\\? " line) "?")))
 
