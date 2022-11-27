@@ -112,7 +112,7 @@ hl-todo                 ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
 modeline                ; snazzy, Atom-inspired modeline, plus API
 ophints                 ; highlight the region an operation acts on
 (popup +defaults)       ; tame sudden yet inevitable temporary windows
-unicode                 ; extended unicode support for various languages
+;;unicode                 ; extended unicode support for various languages
 workspaces              ; tab emulation, persistence & separate workspaces
 zen                     ; distraction-free coding or writing
 #+end_src
@@ -212,10 +212,13 @@ kotlin                  ; a better, slicker Java(Script)
 latex                   ; writing papers in Emacs has never been so fun
 lua                     ; one-based indices? one-based indices
 markdown                ; writing docs for people to ignore
+python                  ; beautiful is better than ugly
 (org                    ; organize your plain life in plain text
 +roam2                  ; whoa a second brain?
 +appear                 ; reduce the unnecessary text
 +present                ; present like a chad
++babel                  ; babel
++gnuplot                ; gnuplot
 +cliplink)              ; nuclear code
 racket                  ; a DSL for DSLs
 rest                    ; Emacs as a REST client
@@ -228,12 +231,11 @@ yaml                    ; JSON, but readable
 
 ** Email
 
-Sebenarnya modul ini sangat menarik, tetapi saya tidak ingin menginvestasikan waktu saya pada saat ini untuk memakai modul ini, karena saya masih perlu bersih-bersih email saya.
+Saya menggunakan =mu4e= karena populer saja. Sebenarnya saya tertarik untuk menggunakan yang lain seperti GNUs dan sebagainya, namun =mu4e= ini menarik karena nano-emacs punya konfigurasi terkait ini.
 
 #+name: doom-email
 #+begin_src elisp
-;;notmuch
-;;(wanderlust +gmail)
+(:if (executable-find "mu") (mu4e +org +gmail))
 #+end_src
 
 ** Aplikasi
@@ -283,33 +285,34 @@ Saya perlu mengatur informasi pribadi saya ke dalam variabel yang sudah ditentuk
 
 ** Font
 
-Saya suka menggunakan font Iosevka, sayangnya font ini tidak terlalu cocok untuk digunakan di situs pribadi saya. Ya sudah akhirnya saya implementasikan disini saja.
+Saya suka fon bawaan dari system. Untuk sistem operasi yang pakai adalah Arch Linux, kemungkinan besar fon bawaannya adalah "Noto Sans Mono" dan sebagainya.
 
 #+name: font
 #+begin_src elisp :tangle ./config.el
 (setq doom-font
-      (font-spec :family "Iosevka Fixed" :size 16)
+      (font-spec :family "Noto Sans Mono" :size 16)
 
       doom-big-font
       (font-spec :size 32)
 
       doom-variable-pitch-font
-      (font-spec :family "Iosevka Aile" :size 16 :weight 'normal)
+      (font-spec :family "Noto Serif" :size 16 :weight 'book)
 
       doom-unicode-font
       (font-spec :family "JuliaMono")
 
       doom-serif-font
-      (font-spec :family "Iosevka Etoile" :weight 'normal))
+      (font-spec :family "Noto Serif" :weight 'book))
 #+end_src
 
 Dan juga saya perlu memodifikasi beberapa simbol yang ditampilkan oleh emacs, karena secara bawaan masih terlihat sedikit aneh bagi mata saya. Kode di bawah ini berfungsi untuk membuat simbol /comment/ dan /keyword/ di dalam emacs ditampilkan dengan huruf miring.
 
-#+name: custom-face
+#+name: custom-faces
 #+begin_src elisp :tangle ./config.el
 (custom-set-faces!
   '(font-lock-comment-face :slant italic)
-  '(font-lock-keyword-face :slant italic))
+  '(font-lock-keyword-face :slant italic)
+  `(org-indent :inherit fixed-pitch :foreground ,(face-attribute 'default :background)))
 #+end_src
 
 ** Antarmuka
@@ -416,6 +419,18 @@ Doom emacs punya banyak pengaturan bawaan yang canggih-canggih, saya cuma perlu 
       truncate-string-ellipsis "…") ; Save some precious space
 #+end_src
 
+* Email
+
+Saya menggunakan mu4e kebutuhan email saya. Untuk melakukan konfigurasi mu4e, saya hanya perlu menspesifikasikan beberapa variabel ke dalam emacs saya.
+
+#+begin_src elisp :tangle ./config.el
+(setq mu4e-view-prefer-html nil
+      mu4e-html2text-command "html2text -utf8 -width 72")
+(with-eval-after-load "mm-decode"
+  (add-to-list 'mm-discouraged-alternatives "text/html")
+  (add-to-list 'mm-discouraged-alternatives "text/richtext"))
+#+end_src
+
 * Pencatatan
 
 Untuk pencatatan sendiri saya menggunakan =deft=. Tidak tahu kenapa, tapi saya baru mencobanya saat ini.
@@ -447,11 +462,9 @@ Saya tidak terlalu suka juga dengan tampilan bawaan ketika saya membuka catatan.
       (progn
         (setq-local visual-fill-column-width 96
                     visual-fill-column-center-text t)
-        (mixed-pitch-mode 1)
         (visual-fill-column-mode 1))
     (progn
       (setq-local visual-fill-column-width nil)
-      (mixed-pitch-mode 0)
       (visual-fill-column-mode 0))))
 
 (provide 'fain-org-note)
@@ -504,6 +517,9 @@ Kode dibawah ini berguna untuk mengatur /behaviour/ dari /org mode/ itu sendiri 
 (setq org-use-property-inheritance t
       org-log-done 'time
       org-startup-indented t
+      org-adapt-indentation t
+      org-indent-mode-turns-off-org-adapt-indentation nil
+      org-hide-leading-stars t
       org-list-allow-alphabetical t
       org-export-in-background t
       org-fold-catch-invisible-edits 'smart)
@@ -535,11 +551,19 @@ Dan juga, karena tulisan saya punya tajuk yang semakin menjorok ke dalam, maka d
 #+begin_src elisp :tangle ./config.el
 (use-package! org-modern
   :custom
-  (org-modern-star '("◈" "◇" "◈" "◇" "◈" "◇" "◈" "◇"))
-  (org-modern-hide-stars 'leading)
+  (org-modern-star '("•"))
+  (org-modern-list '((43 . "◦") (45 . "•") (42 . "•")))
+  (org-modern-hide-stars " ")
   (org-modern-block-fringe nil)
   :config
   (global-org-modern-mode))
+#+end_src
+
+Ketika kita menyalakan =mixed-pitch-mode=, akan terjadi inkonsistensi di dalam tampilan di dalam org mode. Karena bintang dan judul dari suatu tajuk ditampilkan dengan /variable pitch font/ yang mana memiliki panjang yang berbeda-beda.
+
+#+begin_src elisp :tangle ./config.el
+;;(dolist (face org-level-faces)
+;;  (custom-set-faces! `(,face :family ,(face-attribute 'fixed-pitch :family) :weight bold :foreground ,(face-attribute face :foreground))))
 #+end_src
 
 *** Emphasis Tidak Terlihat
@@ -599,6 +623,16 @@ Kode dibawah ini saya gunakan untuk mengatur variabel =+org-agenda-directory= da
                                '("INBOX.org" "PROJECTS.org" "NEXT.org" "MAYBE.org")))
 #+end_src
 
+*** Membuka File Agenda Secara Otomatis
+
+#+begin_src elisp :tangle ./config.el
+(defun +org-agenda-finalize-hook ()
+ (dolist (file org-agenda-files)
+  (find-file-noselect file)))
+
+(add-hook 'org-agenda-finalize-hook #'+org-agenda-finalize-hook)
+#+end_src
+
 *** Kata Kunci Status Pekerjaan
 
 Org agenda tidak akan berguna kalau tidak saya gunakan untuk melacak status dari sebuah pekerjaan. Untuk melacak status dari pekerjaan, intinya saya butuh 4 status, yaitu:
@@ -624,6 +658,8 @@ Ketika saya mencatat semua hal yang perlu saya lakukan, tentu saja akan ada masa
 (setq org-refile-targets '(("PROJECTS.org" :maxlevel . 3)
                              ("MAYBE.org" :level . 1)
                              ("NEXT.org" :maxlevel . 2)))
+
+(advice-add 'org-refile :after 'org-save-all-org-buffers)
 #+end_src
 
 *** Capture Template
@@ -921,6 +957,43 @@ Seperti yang sudah saya sebut di muka tadi, org roam ui ini berfungsi untuk memv
           org-roam-ui-follow t
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
+#+end_src
+
+** Blog
+
+Tujuan saya menggunakan org salah satunya adalah mulai membuat blog. Untuk itu, saya membuat fungsi untuk membuat file blog secara otomatis.
+
+#+begin_src elisp :tangle ./config.el
+(defvar create-blog-post--replace-alist '(" " "'")
+  "Cons of replace str")
+
+(defvar create-blog-post--directory "~/Repositories/fikrirnurhidayat/content/id/"
+  "Where to store blog files.")
+
+(defun create-blog-post--slugify (title)
+  (downcase (string-replace " " "-" title)))
+
+(defun create-blog-post ()
+  "Create an org file in ~/source/myblog/posts."
+  (interactive)
+  (let* ((title (read-string "Title: "))
+         (slug (create-blog-post--slugify title))
+         (directory (concat create-blog-post--directory slug)))
+    (find-file (expand-file-name "index.org" directory))))
+#+end_src
+
+** Ekpor Teks ke Slack
+
+Saya terkadang menulis notulensi rapat menggunakan org mode, karena saya perlu menyebarkannya ke kanal Slack, maka dari itu saya perlu /export backend/ untuk mengekspor dari org ke slack.
+
+#+begin_src elisp :tangle ./packages.el
+(package! ox-slack)
+#+end_src
+
+Doom emacs memiliki fungsi yang berguna untuk mengekspor teks yang dipilih ke /clipboard/, karena kita menginstal /export backend/ baru, kita perlu meregistrasikan benda tersebut ke dalam =org-export-backends=.
+
+#+begin_src elisp :tangle ./config.el
+(appendq! org-export-backends '(slack))
 #+end_src
 
 * Pemrograman

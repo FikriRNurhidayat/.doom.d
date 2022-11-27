@@ -10,11 +10,9 @@
       (progn
         (setq-local visual-fill-column-width 96
                     visual-fill-column-center-text t)
-        (mixed-pitch-mode 1)
         (visual-fill-column-mode 1))
     (progn
       (setq-local visual-fill-column-width nil)
-      (mixed-pitch-mode 0)
       (visual-fill-column-mode 0))))
 
 (provide 'fain-org-note)

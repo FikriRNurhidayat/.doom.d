@@ -4,23 +4,24 @@
       user-mail-address "fikrirnurhidayat@gmail.com")
 
 (setq doom-font
-      (font-spec :family "Iosevka Fixed" :size 16)
+      (font-spec :family "Noto Sans Mono" :size 16)
 
       doom-big-font
       (font-spec :size 32)
 
       doom-variable-pitch-font
-      (font-spec :family "Iosevka Aile" :size 16 :weight 'normal)
+      (font-spec :family "Noto Serif" :size 16 :weight 'book)
 
       doom-unicode-font
       (font-spec :family "JuliaMono")
 
       doom-serif-font
-      (font-spec :family "Iosevka Etoile" :weight 'normal))
+      (font-spec :family "Noto Serif" :weight 'book))
 
 (custom-set-faces!
   '(font-lock-comment-face :slant italic)
-  '(font-lock-keyword-face :slant italic))
+  '(font-lock-keyword-face :slant italic)
+  `(org-indent :inherit fixed-pitch :foreground ,(face-attribute 'default :background)))
 
 (setq display-line-numbers-type 'relative)
 
@@ -62,6 +63,12 @@
       auto-save-default t           ; Make sure your work is saved
       truncate-string-ellipsis "…") ; Save some precious space
 
+(setq mu4e-view-prefer-html nil
+      mu4e-html2text-command "html2text -utf8 -width 72")
+(with-eval-after-load "mm-decode"
+  (add-to-list 'mm-discouraged-alternatives "text/html")
+  (add-to-list 'mm-discouraged-alternatives "text/richtext"))
+
 (use-package! deft
   :init
   (setq deft-directory "/home/fain/Documents/notes/"
@@ -83,6 +90,9 @@
 (setq org-use-property-inheritance t
       org-log-done 'time
       org-startup-indented t
+      org-adapt-indentation t
+      org-indent-mode-turns-off-org-adapt-indentation nil
+      org-hide-leading-stars t
       org-list-allow-alphabetical t
       org-export-in-background t
       org-fold-catch-invisible-edits 'smart)
@@ -91,11 +101,15 @@
 
 (use-package! org-modern
   :custom
-  (org-modern-star '("◈" "◇" "◈" "◇" "◈" "◇" "◈" "◇"))
-  (org-modern-hide-stars 'leading)
+  (org-modern-star '("•"))
+  (org-modern-list '((43 . "◦") (45 . "•") (42 . "•")))
+  (org-modern-hide-stars " ")
   (org-modern-block-fringe nil)
   :config
   (global-org-modern-mode))
+
+(dolist (face org-level-faces)
+  (custom-set-faces! `(,face :family ,(face-attribute 'fixed-pitch :family) :weight bold :foreground ,(face-attribute face :foreground))))
 
 (setq org-hide-emphasis-markers t)
 
@@ -117,12 +131,20 @@
                                  (concat +org-agenda-directory file))
                                '("INBOX.org" "PROJECTS.org" "NEXT.org" "MAYBE.org")))
 
+(defun +org-agenda-finalize-hook ()
+ (dolist (file org-agenda-files)
+  (find-file-noselect file)))
+
+(add-hook 'org-agenda-finalize-hook #'+org-agenda-finalize-hook)
+
 (setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
                           (sequence "WAIT(w@/!)" "HOLD(h@/!)" "|" "VOID(c@/!)")))
 
 (setq org-refile-targets '(("PROJECTS.org" :maxlevel . 3)
                              ("MAYBE.org" :level . 1)
                              ("NEXT.org" :maxlevel . 2)))
+
+(advice-add 'org-refile :after 'org-save-all-org-buffers)
 
 (setq org-capture-templates '(("i" "Inbox" entry (file "~/Documents/org/agenda/INBOX.org") "* TODO %i%?")
                               ("w" "Website" entry (file "~/Documents/org/agenda/INBOX.org")
@@ -262,6 +284,25 @@
           org-roam-ui-follow t
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
+
+(defvar create-blog-post--replace-alist '(" " "'")
+  "Cons of replace str")
+
+(defvar create-blog-post--directory "~/Repositories/fikrirnurhidayat/content/id/"
+  "Where to store blog files.")
+
+(defun create-blog-post--slugify (title)
+  (downcase (string-replace " " "-" title)))
+
+(defun create-blog-post ()
+  "Create an org file in ~/source/myblog/posts."
+  (interactive)
+  (let* ((title (read-string "Title: "))
+         (slug (create-blog-post--slugify title))
+         (directory (concat create-blog-post--directory slug)))
+    (find-file (expand-file-name "index.org" directory))))
+
+(appendq! org-export-backends '(slack))
 
 (load-file (concat doom-user-dir "lisp/fain-eshell.el"))
 

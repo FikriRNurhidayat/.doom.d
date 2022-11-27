@@ -11,6 +11,8 @@
 (unpin! org-roam)
 (package! org-roam-ui)
 
+(package! ox-slack)
+
 (package! xterm-color)
 
 (package! ripgrep)

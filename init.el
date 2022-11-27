@@ -18,7 +18,7 @@
        modeline                ; snazzy, Atom-inspired modeline, plus API
        ophints                 ; highlight the region an operation acts on
        (popup +defaults)       ; tame sudden yet inevitable temporary windows
-       unicode                 ; extended unicode support for various languages
+       ;;unicode                 ; extended unicode support for various languages
        workspaces              ; tab emulation, persistence & separate workspaces
        zen                     ; distraction-free coding or writing
 
@@ -72,10 +72,13 @@
        latex                   ; writing papers in Emacs has never been so fun
        lua                     ; one-based indices? one-based indices
        markdown                ; writing docs for people to ignore
+       python                  ; beautiful is better than ugly
        (org                    ; organize your plain life in plain text
        +roam2                  ; whoa a second brain?
        +appear                 ; reduce the unnecessary text
        +present                ; present like a chad
+       +babel                  ; babel
+       +gnuplot                ; gnuplot
        +cliplink)              ; nuclear code
        racket                  ; a DSL for DSLs
        rest                    ; Emacs as a REST client
@@ -86,8 +89,7 @@
        yaml                    ; JSON, but readable
 
        :email
-       ;;notmuch
-       ;;(wanderlust +gmail)
+       (:if (executable-find "mu") (mu4e +org +gmail))
 
        :app
        ;;calendar
