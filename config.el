@@ -69,6 +69,8 @@
   (add-to-list 'mm-discouraged-alternatives "text/html")
   (add-to-list 'mm-discouraged-alternatives "text/richtext"))
 
+(load-file (concat doom-user-dir "lisp/fain-splash.el"))
+
 (use-package! deft
   :init
   (setq deft-directory "/home/fain/Documents/notes/"
@@ -90,8 +92,8 @@
 (setq org-use-property-inheritance t
       org-log-done 'time
       org-startup-indented t
-      org-adapt-indentation t
-      org-indent-mode-turns-off-org-adapt-indentation nil
+      org-adapt-indentation nil
+      org-indent-mode-turns-off-org-adapt-indentation t
       org-hide-leading-stars t
       org-list-allow-alphabetical t
       org-export-in-background t
@@ -309,4 +311,4 @@
 (use-package! projectile
   :init
   (when (and (file-directory-p "~/Works/Repositories") (file-directory-p "~/Repositories"))
-    (setq projectile-project-search-path '("~/Work/Repositories" "~/Repositories"))))
+    (setq projectile-project-search-path '("~/Work/Repositories" "~/Repositories" "~/Repositories/GO/src"))))

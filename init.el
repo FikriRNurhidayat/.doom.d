@@ -13,6 +13,7 @@
        :ui
        deft                    ; notational velocity for Emacs
        doom                    ; what makes DOOM look the way it does
+       doom-dashboard          ; nifty dashboard
        hl-todo                 ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
        (ligatures +extra)      ; ligatures and symbols to make your code pretty again
        modeline                ; snazzy, Atom-inspired modeline, plus API
