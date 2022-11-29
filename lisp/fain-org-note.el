@@ -8,7 +8,7 @@
   :lighter "fain-org-note"
   (if fain-org-note-mode
       (progn
-        (setq-local visual-fill-column-width 96
+        (setq-local visual-fill-column-width 72
                     visual-fill-column-center-text t)
         (visual-fill-column-mode 1))
     (progn

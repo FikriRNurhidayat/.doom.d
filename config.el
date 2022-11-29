@@ -232,16 +232,7 @@
   (when writeroom-mode (writeroom-mode 0))
   (setq-local visual-fill-column-width 192
               visual-fill-column-center-text t
-              header-line-format " "
-              face-remapping-alist '((default (:height 2.0) variable-pitch)
-                                     (header-line (:height 4.0) variable-pitch)
-                                     (org-document-title (:height 2.0) org-document-title)
-                                     (org-table (:height 0.5 :family "Iosevka") org-table)
-                                     (org-code (:height 1.0 :family "Iosevka") org-code)
-                                     (org-verbatim (:height 1.0 :family "Iosevka") org-verbatim)
-                                     (org-block (:height 1.0 :family "Iosevka") org-block)
-                                     (org-block-begin-line (:height 0.7) org-block-begin-line)
-                                     (org-block-end-line (:height 0.7) org-block-end-line)))
+              header-line-format " ")
   (display-line-numbers-mode 0)
   (visual-fill-column-mode 1)
   (visual-line-mode 1)
@@ -249,13 +240,11 @@
   (org-display-inline-images))
 
 (defun +org-present-quit-hook ()
-  (setq-local face-remapping-alist '((default variable-pitch default)))
   (setq header-line-format nil)
   (org-present-small)
   (visual-fill-column-mode 0)
   (org-indent-mode 1)
   (hide-mode-line-mode 0)
-  (org-superstar-restart)
   (org-mode-restart)
   (org-remove-inline-images))
 
@@ -305,6 +294,8 @@
     (find-file (expand-file-name "index.org" directory))))
 
 (appendq! org-export-backends '(slack))
+
+(appendq! org-export-backends '(gfm))
 
 (load-file (concat doom-user-dir "lisp/fain-eshell.el"))
 

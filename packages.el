@@ -13,6 +13,8 @@
 
 (package! ox-slack)
 
+(package! ox-gfm)
+
 (package! xterm-color)
 
 (package! ripgrep)

@@ -27,3 +27,4 @@
  '(window-divider ((t (:foreground "#2E3440"))))
  '(window-divider-first-pixel ((t (:foreground "#2E3440"))))
  '(window-divider-last-pixel ((t (:foreground "#2E3440")))))
+(put 'projectile-ripgrep 'disabled nil)
