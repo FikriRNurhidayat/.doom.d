@@ -44,9 +44,7 @@
 
 (use-package! doom-modeline
   :config
-  (setq doom-modeline-height 48
-        doom-modeline-bar-width 8
-        doom-modeline-hud nil
+  (setq doom-modeline-hud nil
         doom-modeline-icon t
         doom-modeline-window-width-limit nil
         doom-modeline-major-mode-icon t
@@ -69,7 +67,7 @@
   (add-to-list 'mm-discouraged-alternatives "text/html")
   (add-to-list 'mm-discouraged-alternatives "text/richtext"))
 
-(load-file (concat doom-user-dir "lisp/fain-splash.el"))
+(load-file (concat doom-user-dir "lisp/splash/splash.el"))
 
 (use-package! deft
   :init
@@ -79,11 +77,11 @@
         deft-strip-title-regexp "\\(?:^%+\\|^#\\+title: *\\|^[#* ]+\\|-\\*-[[:alpha:]]+-\\*-\\|^Title:[	 ]*\\|#+$\\)"
         deft-open-file-hook '+deft-open-file-hook))
 
-(load-file (concat doom-user-dir "lisp/fain-org-note.el"))
+(load-file (concat doom-user-dir "lisp/org/org-note.el"))
 
 (defun +deft-open-file-hook ()
   (when (eq major-mode 'org-mode)
-    (fain-org-note-mode 1)))
+    (org-note-mode 1)))
 
 (setq org-directory "/home/fain/Documents/org/")
 
@@ -125,6 +123,11 @@
   ;; for proper first-time setup, `org-appear--set-elements'
   ;; needs to be run after other hooks have acted.
   (run-at-time nil nil #'org-appear--set-elements))
+
+(custom-set-faces!
+  `(org-block :inherit org-block :background ,(face-attribute 'default :background))
+  `(org-block-begin-line :foreground ,(face-attribute 'org-hide :foreground))
+  `(org-block-end-line :foreground ,(face-attribute 'org-hide :foreground)))
 
 (setq org-pretty-entities t
       org-ellipsis "…")
@@ -203,7 +206,7 @@
 (defun +zen-prose-org-h ()
   "Reformat the current Org buffer appearance for prose."
   (when (eq major-mode 'org-mode)
-    (setq-local visual-fill-column-width 64
+    (setq-local visual-fill-column-width 48
                 org-adapt-indentation nil
                 org-modern-hide-stars t
                 +zen-text-scale 1.0)
@@ -239,21 +242,34 @@
                                        (org-level-8 . 1.0))
   "Org level size remap for presentation.")
 
+;; TODO: Save previous org-indent-mode
+;;       Also for the org-modern-mode
 (defun +org-present-hook ()
+  (org-modern-mode 0)
+  (org-indent-mode 0)
   (setq-local visual-fill-column-width 96
               visual-fill-column-center-text t
+              org-modern-hide-stars t
               header-line-format " ")
-  (setq-local face-remapping-alist (mapcar (lambda (face) `(,(car face) (:height ,(cdr face))  ,(car face))) +org-present-org-level-scale))
+  (setq-local face-remapping-alist (append (mapcar (lambda (face) `(,(car face) (:height ,(cdr face))  ,(car face))) +org-present-org-level-scale)
+                                           '((default (:height 1.5) default)
+                                             (header-line (:height 4.0) header-line)
+                                             (org-document-title (:height 2.0) org-document-title)
+                                             (org-document-info (:height 1.5) org-document-info))))
   (display-line-numbers-mode 0)
   (visual-fill-column-mode 1)
   (visual-line-mode 1)
   (hide-mode-line-mode 1)
-
+  (org-modern-mode 1)
   (org-display-inline-images))
 
+;; TODO: Restore original org-indent-mode value
+;;       Restore org-modern-hide-stars value
 (defun +org-present-quit-hook ()
-  (setq header-line-format nil)
-  (setq-local face-remapping-alist nil)
+  (setq-local header-line-format nil
+              face-remapping-alist nil
+              org-adapt-indentation nil
+              org-modern-hide-stars " ")
   (org-present-small)
   (visual-fill-column-mode 0)
   (org-indent-mode 1)
@@ -310,7 +326,7 @@
 
 (appendq! org-export-backends '(gfm))
 
-(load-file (concat doom-user-dir "lisp/fain-eshell.el"))
+(load-file (concat doom-user-dir "lisp/eshell/eshell.el"))
 
 (use-package! projectile
   :init

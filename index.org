@@ -376,9 +376,7 @@ Karena saya menggunakan doom, tentu saja saya akan menggunakan /doom modeline/ s
 #+begin_src elisp :tangle ./config.el
 (use-package! doom-modeline
   :config
-  (setq doom-modeline-height 48
-        doom-modeline-bar-width 8
-        doom-modeline-hud nil
+  (setq doom-modeline-hud nil
         doom-modeline-icon t
         doom-modeline-window-width-limit nil
         doom-modeline-major-mode-icon t
@@ -436,8 +434,8 @@ Saya menggunakan mu4e kebutuhan email saya. Untuk melakukan konfigurasi mu4e, sa
 
 Splash Screen adalah /fallback buffer/ dari doom emacs. Saya ingin memodifikasinya sehingga terlihat menarik. Modifikasi ini saya curi dari Tecosaur.
 
-#+begin_src elisp :tangle ./lisp/fain-splash.el
-;;; $DOOMDIR/lisp/fain-splash.el -*- lexical-binding: t; -*-
+#+begin_src elisp :tangle ./lisp/splash/splash.el
+;;; $DOOMDIR/lisp/splash/splash.el -*- lexical-binding: t; -*-
 
 (defvar fancy-splash-image-template
   (expand-file-name "misc/splash-images/emacs-e-template.svg" doom-private-dir)
@@ -534,7 +532,7 @@ Splash Screen adalah /fallback buffer/ dari doom emacs. Saya ingin memodifikasin
 
 Dan juga, sepertinya one liner sentence itu menarik juga untuk ditambahkan.
 
-#+begin_src elisp :tangle ./lisp/fain-splash.el
+#+begin_src elisp :tangle ./lisp/splash/splash.el
 (defun +doom-dashboard-remove-annoying-visual ()
   "Hide cursor and modeline"
   (hide-mode-line-mode 1)
@@ -549,7 +547,7 @@ Dan juga, sepertinya one liner sentence itu menarik juga untuk ditambahkan.
 Lalu tentu saja, saya perlu memuat file tersebut ke dalam =config.el=
 
 #+begin_src elisp :tangle ./config.el
-(load-file (concat doom-user-dir "lisp/fain-splash.el"))
+(load-file (concat doom-user-dir "lisp/splash/splash.el"))
 #+end_src
 
 * Pencatatan
@@ -570,16 +568,16 @@ Untuk pencatatan sendiri saya menggunakan =deft=. Tidak tahu kenapa, tapi saya b
 
 Saya tidak terlalu suka juga dengan tampilan bawaan ketika saya membuka catatan. Catatan seharusnya terlihat sederhana dan tidak terlalu ribet, jadi saya membuat mode baru.
 
-#+begin_src elisp :tangle ./lisp/fain-org-note.el
-;;; fain-org-note.el --- Make org more like note -*- lexical-binding: t; -*-
+#+begin_src elisp :tangle ./lisp/org/org-note.el
+;;; org/org-note.el --- Make org more like note -*- lexical-binding: t; -*-
 (require 'org)
 (require 'mixed-pitch)
 (require 'visual-fill-column)
 
-(define-minor-mode fain-org-note-mode
-  "Toggle fain-org-note-mode and display org mode as note."
-  :lighter "fain-org-note"
-  (if fain-org-note-mode
+(define-minor-mode org-note-mode
+  "Toggle org-note-mode and display org mode as note."
+  :lighter "org-note"
+  (if org-note-mode
       (progn
         (setq-local visual-fill-column-width 72
                     visual-fill-column-center-text t)
@@ -588,14 +586,14 @@ Saya tidak terlalu suka juga dengan tampilan bawaan ketika saya membuka catatan.
       (setq-local visual-fill-column-width nil)
       (visual-fill-column-mode 0))))
 
-(provide 'fain-org-note)
+(provide 'org-note)
 #+end_src
 
 
 Lalu, muat file tersebut ketika membuka doom emacs.
 
 #+begin_src elisp :tangle ./config.el
-(load-file (concat doom-user-dir "lisp/fain-org-note.el"))
+(load-file (concat doom-user-dir "lisp/org/org-note.el"))
 #+end_src
 
 ** Otomatis Mengaktifkan Mode Pencatatan
@@ -605,7 +603,7 @@ Mode tersebut akan diaktifkan ketika kita membuka catatan melalui deft.
 #+begin_src elisp :tangle ./config.el
 (defun +deft-open-file-hook ()
   (when (eq major-mode 'org-mode)
-    (fain-org-note-mode 1)))
+    (org-note-mode 1)))
 #+end_src
 
 * Org Mode
@@ -724,6 +722,19 @@ Saya juga ingin =org-appear= dinyalakan setiap kali saya membuka file org.
   (run-at-time nil nil #'org-appear--set-elements))
 #+end_src
 
+*** Font
+
+Secara bawaan, ketika saya mengaktifkan =org-indent-mode= secara tampilan akan rusak. Terlebih lagi ketika saya menulis =org-block= yang mana ketika kode-nya melebihi batas maksimal baris, kodenya akan terpotong dan langsung terindentasi.
+
+Untuk menghindari hal-hal seperti itu, saya merubah tampilan dari beberapa /font lock/ yang terdapat pada org mode.
+
+#+begin_src elisp :tangle ./config.el
+(custom-set-faces!
+  `(org-block :inherit org-block :background ,(face-attribute 'default :background))
+  `(org-block-begin-line :foreground ,(face-attribute 'org-hide :foreground))
+  `(org-block-end-line :foreground ,(face-attribute 'org-hide :foreground)))
+#+end_src
+
 *** Lainnya
 
 Disini saya memodifikasi elipsis dan menyuruh emacs untuk menampilkan entitas dengan gaya.
@@ -750,6 +761,7 @@ Kode dibawah ini saya gunakan untuk mengatur variabel =+org-agenda-directory= da
                                  (concat +org-agenda-directory file))
                                '("INBOX.org" "PROJECTS.org" "NEXT.org" "MAYBE.org")))
 #+end_src
+
 
 *** Membuka File Agenda Secara Otomatis
 
@@ -936,7 +948,7 @@ Saya tidak tahu kenapa tecosaur menyebutnya sebagai /prose/, tapi masuk akal jug
 (defun +zen-prose-org-h ()
   "Reformat the current Org buffer appearance for prose."
   (when (eq major-mode 'org-mode)
-    (setq-local visual-fill-column-width 64
+    (setq-local visual-fill-column-width 48
                 org-adapt-indentation nil
                 org-modern-hide-stars t
                 +zen-text-scale 1.0)
@@ -1002,16 +1014,25 @@ Saya perlu merubah ukuran teksnya juga.
 Masih ada beberapa hal yang perlu saya sesuaikan disini, sebagai contoh, saya perlu mendeteksi apakah saat ini dokumen yang saya buka ini sedang ditampilkan dalam mode penulisan atau tidak, dan sebagainya.
 
 #+begin_src elisp :tangle ./config.el
+;; TODO: Save previous org-indent-mode
+;;       Also for the org-modern-mode
 (defun +org-present-hook ()
+  (org-modern-mode 0)
+  (org-indent-mode 0)
   (setq-local visual-fill-column-width 96
               visual-fill-column-center-text t
+              org-modern-hide-stars t
               header-line-format " ")
-  (setq-local face-remapping-alist (mapcar (lambda (face) `(,(car face) (:height ,(cdr face))  ,(car face))) +org-present-org-level-scale))
+  (setq-local face-remapping-alist (append (mapcar (lambda (face) `(,(car face) (:height ,(cdr face))  ,(car face))) +org-present-org-level-scale)
+                                           '((default (:height 1.5) default)
+                                             (header-line (:height 4.0) header-line)
+                                             (org-document-title (:height 2.0) org-document-title)
+                                             (org-document-info (:height 1.5) org-document-info))))
   (display-line-numbers-mode 0)
   (visual-fill-column-mode 1)
   (visual-line-mode 1)
   (hide-mode-line-mode 1)
-
+  (org-modern-mode 1)
   (org-display-inline-images))
 #+end_src
 
@@ -1020,9 +1041,13 @@ Masih ada beberapa hal yang perlu saya sesuaikan disini, sebagai contoh, saya pe
 Sama seperti mode penulisan tadi, ketika saya menonaktifkan mode presentasi, saya perlu mengembalikan apa saja yang saya rubah ketika mengaktifkan mode presentasi ke bentuk aslinya.
 
 #+begin_src elisp :tangle ./config.el
+;; TODO: Restore original org-indent-mode value
+;;       Restore org-modern-hide-stars value
 (defun +org-present-quit-hook ()
-  (setq header-line-format nil)
-  (setq-local face-remapping-alist nil)
+  (setq-local header-line-format nil
+              face-remapping-alist nil
+              org-adapt-indentation nil
+              org-modern-hide-stars " ")
   (org-present-small)
   (visual-fill-column-mode 0)
   (org-indent-mode 1)
@@ -1150,7 +1175,7 @@ Untuk pemrograman sendiri, saya tidak perlu melakukan konfigurasi yang rumit kar
 ** Terminal
 
 #+begin_src elisp :tangle ./config.el
-(load-file (concat doom-user-dir "lisp/fain-eshell.el"))
+(load-file (concat doom-user-dir "lisp/eshell/eshell.el"))
 #+end_src
 
 Untuk terminal sendiri saya menggunakan =eshell=. Terminal ini bisa saya katakan unik, karena terminal ini dapat mengevaluasi ekspresi elisp. Dan juga, terminal ini bisa dikatakan jauh lebih cepat dibandingkan shell dan term. Maka dari itu, menggunakan terminal ini adalah suatu opsi yang bijak.
@@ -1163,8 +1188,8 @@ Tentu saja, ada opsi lain yang tidak kalah bagus, yaitu =vterm=. Saya sendiri su
 
 Konfigurasi terminal ini saya curi juga dari [[https://github.com/daviwil/dotfiles/blob/master/Emacs.org#eshell][Daviwil]].
 
-#+begin_src elisp :tangle ./lisp/fain-eshell.el
-;;; $DOOMDIR/lisp/fain-eshell.el -*- lexical-binding: t; -*-
+#+begin_src elisp :tangle ./lisp/eshell/eshell.el
+;;; $DOOMDIR/lisp/eshell/eshell.el -*- lexical-binding: t; -*-
 (defun read-file (file-path)
   "Read file with temporary buffer."
   (with-temp-buffer
@@ -1222,9 +1247,9 @@ Konfigurasi terminal ini saya curi juga dari [[https://github.com/daviwil/dotfil
 #+end_src
 
 
-/Prompt/ ini benar-benar mencuri dari Daviwil.
+/Prompt/ ini benar-benar saya curi dari Daviwil.
 
-#+begin_src elisp :tangle ./lisp/fain-eshell.el
+#+begin_src elisp :tangle ./lisp/eshell/eshell.el
 (defun +eshell-prompt ()
   (let ((current-branch (magit-get-current-branch)))
     (concat
@@ -1248,7 +1273,7 @@ Konfigurasi terminal ini saya curi juga dari [[https://github.com/daviwil/dotfil
 
 Prompt ini berfungsi untuk menampilkan saya sekarang ada di mana di dalam terminal. Hanya nama direktori saja yang akan ditampilkan.
 
-#+begin_src elisp :tangle ./lisp/fain-eshell.el
+#+begin_src elisp :tangle ./lisp/eshell/eshell.el
 (defun +get-prompt-path ()
   (let* ((current-path (eshell/pwd))
          (git-output (shell-command-to-string "git rev-parse --show-toplevel"))
@@ -1262,7 +1287,7 @@ Prompt ini berfungsi untuk menampilkan saya sekarang ada di mana di dalam termin
 
 Prompt ini berguna untuk memberi tahu saya, saya sedang di /branch/ apa di dalam repository git. Namun ada kemungkinan saya akan nonaktifkan fitur ini dikarenakan ada beberapa repository yang benar-benar berat untuk dimuat.
 
-#+begin_src elisp :tangle ./lisp/fain-eshell.el
+#+begin_src elisp :tangle ./lisp/eshell/eshell.el
 (defun +map-line-to-status-char (line)
   (cond ((string-match "^?\\? " line) "?")))
 

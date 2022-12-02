@@ -1,4 +1,4 @@
-;;; $DOOMDIR/lisp/fain-splash.el -*- lexical-binding: t; -*-
+;;; $DOOMDIR/lisp/splash/splash.el -*- lexical-binding: t; -*-
 
 (defvar fancy-splash-image-template
   (expand-file-name "misc/splash-images/emacs-e-template.svg" doom-private-dir)

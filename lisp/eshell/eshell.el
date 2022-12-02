@@ -1,4 +1,4 @@
-;;; $DOOMDIR/lisp/fain-eshell.el -*- lexical-binding: t; -*-
+;;; $DOOMDIR/lisp/eshell/eshell.el -*- lexical-binding: t; -*-
 (defun read-file (file-path)
   "Read file with temporary buffer."
   (with-temp-buffer
