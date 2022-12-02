@@ -38,8 +38,8 @@
 ;; TODO: Find what hook should we attach so this will always be properly executed
 (add-to-list 'doom-load-theme-hook '+doom-remove-annoying-visual)
 
-(setq inhibit-message nil
-      echo-keystores t
+(setq inhibit-message t
+      echo-keystores nil
       message-log-max 100)
 
 (use-package! doom-modeline
@@ -110,8 +110,9 @@
   :config
   (global-org-modern-mode))
 
-(dolist (face org-level-faces)
-  (custom-set-faces! `(,face :family ,(face-attribute 'fixed-pitch :family) :weight bold :foreground ,(face-attribute face :foreground))))
+;;(use-package! org-modern-indent
+;;  :hook
+;;  (org-indent-mode . org-modern-indent-mode))
 
 (setq org-hide-emphasis-markers t)
 
@@ -202,10 +203,10 @@
 (defun +zen-prose-org-h ()
   "Reformat the current Org buffer appearance for prose."
   (when (eq major-mode 'org-mode)
-    (setq visual-fill-column-width 64
-          org-adapt-indentation nil
-          org-modern-hide-stars t
-          +zen-text-scale 1.0)
+    (setq-local visual-fill-column-width 64
+                org-adapt-indentation nil
+                org-modern-hide-stars t
+                +zen-text-scale 1.0)
     (org-modern-mode 0)
     (org-indent-mode 0)
     (org-modern-mode 1)
@@ -214,8 +215,8 @@
 (defun +zen-nonprose-org-h ()
   "Reverse the effect of `+zen-prose-org'."
   (when (eq major-mode 'org-mode)
-    (setq org-adapt-indentation nil
-          org-modern-hide-stars 'leading)
+    (setq-local org-adapt-indentation nil
+          org-modern-hide-stars " ")
     (org-modern-mode 0)
     (org-indent-mode 1)
     (org-modern-mode 1)
@@ -228,19 +229,31 @@
   (map! :leader :desc "Present" "t p" #'org-present)
   (add-hook 'org-present-after-navigate-functions '+org-present-prepare-slide))
 
+(defvar +org-present-org-level-scale '((org-level-1 . 2.5)
+                                       (org-level-2 . 2.0)
+                                       (org-level-3 . 1.75)
+                                       (org-level-4 . 1.5)
+                                       (org-level-5 . 1.25)
+                                       (org-level-6 . 1.0)
+                                       (org-level-7 . 1.0)
+                                       (org-level-8 . 1.0))
+  "Org level size remap for presentation.")
+
 (defun +org-present-hook ()
-  (when writeroom-mode (writeroom-mode 0))
-  (setq-local visual-fill-column-width 192
+  (setq-local visual-fill-column-width 96
               visual-fill-column-center-text t
               header-line-format " ")
+  (setq-local face-remapping-alist (mapcar (lambda (face) `(,(car face) (:height ,(cdr face))  ,(car face))) +org-present-org-level-scale))
   (display-line-numbers-mode 0)
   (visual-fill-column-mode 1)
   (visual-line-mode 1)
   (hide-mode-line-mode 1)
+
   (org-display-inline-images))
 
 (defun +org-present-quit-hook ()
   (setq header-line-format nil)
+  (setq-local face-remapping-alist nil)
   (org-present-small)
   (visual-fill-column-mode 0)
   (org-indent-mode 1)
