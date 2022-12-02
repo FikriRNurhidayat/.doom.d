@@ -125,9 +125,7 @@
   (run-at-time nil nil #'org-appear--set-elements))
 
 (custom-set-faces!
-  `(org-block :inherit org-block :background ,(face-attribute 'default :background))
-  `(org-block-begin-line :foreground ,(face-attribute 'org-hide :foreground))
-  `(org-block-end-line :foreground ,(face-attribute 'org-hide :foreground)))
+  `(org-block :inherit org-block :background ,(face-attribute 'default :background)))
 
 (setq org-pretty-entities t
       org-ellipsis "…")
@@ -261,6 +259,7 @@
   (visual-line-mode 1)
   (hide-mode-line-mode 1)
   (org-modern-mode 1)
+  (mixed-pitch-mode 1)
   (org-display-inline-images))
 
 ;; TODO: Restore original org-indent-mode value
@@ -274,6 +273,7 @@
   (visual-fill-column-mode 0)
   (org-indent-mode 1)
   (hide-mode-line-mode 0)
+  (mixed-pitch-mode 0)
   (org-mode-restart)
   (org-remove-inline-images))
 
