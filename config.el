@@ -326,6 +326,8 @@
 
 (appendq! org-export-backends '(gfm))
 
+(setq +ligatures-extra-alist nil)
+
 (load-file (concat doom-user-dir "lisp/eshell/eshell.el"))
 
 (use-package! projectile

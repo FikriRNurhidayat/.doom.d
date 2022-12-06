@@ -19,6 +19,6 @@
 
 (package! xterm-color)
 
-(package! ripgrep)
-
 (package! protobuf-mode)
+
+(package! ripgrep)

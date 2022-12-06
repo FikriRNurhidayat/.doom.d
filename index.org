@@ -430,7 +430,7 @@ Saya menggunakan mu4e kebutuhan email saya. Untuk melakukan konfigurasi mu4e, sa
   (add-to-list 'mm-discouraged-alternatives "text/richtext"))
 #+end_src
 
-* TODO Splash Screen
+* Splash Screen
 
 Splash Screen adalah /fallback buffer/ dari doom emacs. Saya ingin memodifikasinya sehingga terlihat menarik. Modifikasi ini saya curi dari Tecosaur.
 
@@ -759,7 +759,6 @@ Kode dibawah ini saya gunakan untuk mengatur variabel =+org-agenda-directory= da
                                  (concat +org-agenda-directory file))
                                '("INBOX.org" "PROJECTS.org" "NEXT.org" "MAYBE.org")))
 #+end_src
-
 
 *** Membuka File Agenda Secara Otomatis
 
@@ -1172,6 +1171,14 @@ Doom emacs memiliki fungsi yang berguna untuk mengekspor teks yang dipilih ke /c
 
 Untuk pemrograman sendiri, saya tidak perlu melakukan konfigurasi yang rumit karena /doom emacs/ sendiri sudah mengabstraksi semuanya. Pada bagian ini, saya hanya akan menjabarkan terkait /tools/ yang saya gunakan dalam pemrograman di emacs, yaitu terminal, dan manajemen proyeknya.
 
+** Ligature
+
+Secara bawaan, ketika saya menginstal =ligatures +extra= di dalam UI, doom emacs akan memasang banyak /ligature/ di dalam bahasa pemrograman. Saya sendiri tidak terlalu senang dengan hal itu, maka dari itu lebih baik saya nonaktifkan saja dengan kode berikut:
+
+#+begin_src elisp :tangle ./config.el
+(setq +ligatures-extra-alist nil)
+#+end_src
+
 ** Terminal
 
 #+begin_src elisp :tangle ./config.el
@@ -1296,6 +1303,12 @@ Prompt ini berguna untuk memberi tahu saya, saya sedang di /branch/ apa di dalam
     (seq-uniq (seq-filter 'identity (mapcar '+map-line-to-status-char status-lines)))))
 #+end_src
 
+** Protobuf
+
+#+begin_src elisp :tangle ./packages.el
+(package! protobuf-mode)
+#+end_src
+
 ** Projectile
 
 /Projectile/ adalah sebuah /package/ yang membantu saya untuk berpindah-pindah proyek di dalam emacs. Disini saya hanya perlu memberitahu dimana direktori proyek saya.
@@ -1313,10 +1326,4 @@ Ripgrep adalah sebuah biner yang berfungsi layaknya /grep/, bedanya /ripgrep/ ja
 
 #+begin_src elisp :tangle ./packages.el
 (package! ripgrep)
-#+end_src
-
-** Protobuf
-
-#+begin_src elisp :tangle ./packages.el
-(package! protobuf-mode)
 #+end_src
