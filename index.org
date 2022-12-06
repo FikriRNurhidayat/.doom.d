@@ -198,15 +198,15 @@ Karena saya tergolong poligot di dalam bahasa pemrograman, maka dari itu saya me
 
 #+name: doom-lang
 #+begin_src elisp
-(cc +lsp)               ; C > C++ == 1
+(cc +eglot)               ; C > C++ == 1
 clojure                 ; java with a lisp
 common-lisp             ; if you've seen one lisp, you've seen them all
 data                    ; config/data formats
-(dart +flutter +lsp)    ; paint ui and not much else
+(dart +flutter +eglot)    ; paint ui and not much else
 emacs-lisp              ; drown in parentheses
-(go +lsp)               ; the hipster dialect
+(go +eglot)               ; the hipster dialect
 json                    ; At least it ain't XML
-(java +lsp)             ; the poster child for carpal tunnel syndrome
+(java +eglot)             ; the poster child for carpal tunnel syndrome
 javascript              ; all(hope(abandon(ye(who(enter(here))))))
 julia                   ; a better, faster MATLAB
 kotlin                  ; a better, slicker Java(Script)
@@ -224,7 +224,7 @@ python                  ; beautiful is better than ugly
 racket                  ; a DSL for DSLs
 rest                    ; Emacs as a REST client
 (ruby +rails)           ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
-(rust +lsp)             ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+(rust +eglot)           ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
 (scheme +guile)         ; a fully conniving family of lisps
 sh                      ; she sells {ba,z,fi}sh shells on the C xor
 yaml                    ; JSON, but readable
