@@ -106,6 +106,13 @@
   (org-modern-star '("•"))
   (org-modern-list '((43 . "◦") (45 . "•") (42 . "•")))
   (org-modern-hide-stars " ")
+  (org-modern-keyword '(("title"       . "title:       ")
+                        ("description" . "description: ")
+                        ("subtitle"    . "subtitle:    ")
+                        ("date"        . "date:        ")
+                        ("author"      . "author:      ")
+                        ("language"    . "language:    ")
+                        (t . t)))
   (org-modern-block-fringe nil)
   :config
   (global-org-modern-mode))
@@ -124,7 +131,8 @@
 
 (custom-set-faces!
   `(org-block :inherit org-block :background ,(face-attribute 'default :background))
-  `(org-block-begin-line :inherit shadow :height 0.8))
+  `(org-block-begin-line :inherit shadow :height 0.8)
+  `(org-document-info :inherit doom-font))
 
 (setq org-pretty-entities t
       org-ellipsis "…")
@@ -228,7 +236,7 @@
   :hook ((org-present-mode . +org-present-hook)
          (org-present-mode-quit . +org-present-quit-hook))
   :init
-  (map! :leader :desc "Present" "t p" #'org-present)
+  (map! :leader :desc "Present" "t p" #'org-present-mode)
   (add-hook 'org-present-after-navigate-functions '+org-present-prepare-slide))
 
 (defvar +org-present-org-level-scale '((org-level-1 . 2.5)

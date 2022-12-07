@@ -1,8 +1,8 @@
 #+title: Doom Emacs
 #+subtitle: Konfigurasi Instrumen Kiamat Saya.
 #+date: 20 November 2022
-#+description: Konfigurasi Instrumen Kiamat Saya.
 #+author: Fikri Rahmat Nurhidayat
+#+description: Konfigurasi Instrumen Kiamat Saya.
 #+language: id
 
 * Prakata
@@ -581,6 +581,24 @@ Saya tidak terlalu suka juga dengan tampilan bawaan ketika saya membuka catatan.
       (progn
         (setq-local visual-fill-column-width 96
                     visual-fill-column-center-text t)
+        (pushnew! mixed-pitch-fixed-pitch-faces
+            'solaire-line-number-face
+            'org-document-info
+            'org-date
+            'org-footnote
+            'org-special-keyword
+            'org-property-value
+            'org-ref-cite-face
+            'org-tag
+            'org-todo-keyword-todo
+            'org-todo-keyword-habt
+            'org-todo-keyword-done
+            'org-todo-keyword-wait
+            'org-todo-keyword-kill
+            'org-todo-keyword-outd
+            'org-todo
+            'org-done
+            'font-lock-comment-face)
         (visual-fill-column-mode 1)
         (mixed-pitch-mode 1))
     (progn
@@ -681,6 +699,13 @@ Dan juga, karena tulisan saya punya tajuk yang semakin menjorok ke dalam, maka d
   (org-modern-star '("•"))
   (org-modern-list '((43 . "◦") (45 . "•") (42 . "•")))
   (org-modern-hide-stars " ")
+  (org-modern-keyword '(("title"       . "title:       ")
+                        ("description" . "description: ")
+                        ("subtitle"    . "subtitle:    ")
+                        ("date"        . "date:        ")
+                        ("author"      . "author:      ")
+                        ("language"    . "language:    ")
+                        (t . t)))
   (org-modern-block-fringe nil)
   :config
   (global-org-modern-mode))
@@ -725,7 +750,8 @@ Untuk menghindari hal-hal seperti itu, saya merubah tampilan dari beberapa /font
 #+begin_src elisp :tangle ./config.el
 (custom-set-faces!
   `(org-block :inherit org-block :background ,(face-attribute 'default :background))
-  `(org-block-begin-line :inherit shadow :height 0.8))
+  `(org-block-begin-line :inherit shadow :height 0.8)
+  `(org-document-info :inherit doom-font))
 #+end_src
 
 *** Lainnya
