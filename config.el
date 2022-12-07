@@ -106,12 +106,12 @@
   (org-modern-star '("•"))
   (org-modern-list '((43 . "◦") (45 . "•") (42 . "•")))
   (org-modern-hide-stars " ")
-  (org-modern-keyword '(("title"       . "title:       ")
-                        ("description" . "description: ")
-                        ("subtitle"    . "subtitle:    ")
-                        ("date"        . "date:        ")
-                        ("author"      . "author:      ")
-                        ("language"    . "language:    ")
+  (org-modern-keyword '(("title"       . "title:      ")
+                        ("description" . "description:")
+                        ("subtitle"    . "subtitle:   ")
+                        ("date"        . "date:       ")
+                        ("author"      . "author:     ")
+                        ("language"    . "language:   ")
                         (t . t)))
   (org-modern-block-fringe nil)
   :config
@@ -132,7 +132,9 @@
 (custom-set-faces!
   `(org-block :inherit org-block :background ,(face-attribute 'default :background))
   `(org-block-begin-line :inherit shadow :height 0.8)
-  `(org-document-info :inherit doom-font))
+  `(org-meta-line :foreground ,(face-attribute 'shadow :foreground))
+  `(org-document-info :foreground ,(face-attribute 'default :foreground))
+  `(org-document-title :height 2.0 :weight bold :foreground ,(face-attribute 'default :foreground)))
 
 (setq org-pretty-entities t
       org-ellipsis "…")
@@ -213,7 +215,7 @@
 (defun +zen-prose-org-h ()
   "Reformat the current Org buffer appearance for prose."
   (when (eq major-mode 'org-mode)
-    (setq-local visual-fill-column-width 48
+    (setq-local visual-fill-column-width 72
                 org-adapt-indentation nil
                 org-modern-hide-stars t
                 +zen-text-scale 1.0)
@@ -236,7 +238,7 @@
   :hook ((org-present-mode . +org-present-hook)
          (org-present-mode-quit . +org-present-quit-hook))
   :init
-  (map! :leader :desc "Present" "t p" #'org-present-mode)
+  (map! :leader :desc "Present" "t p" #'org-present)
   (add-hook 'org-present-after-navigate-functions '+org-present-prepare-slide))
 
 (defvar +org-present-org-level-scale '((org-level-1 . 2.5)

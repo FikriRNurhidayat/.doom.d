@@ -699,12 +699,12 @@ Dan juga, karena tulisan saya punya tajuk yang semakin menjorok ke dalam, maka d
   (org-modern-star '("•"))
   (org-modern-list '((43 . "◦") (45 . "•") (42 . "•")))
   (org-modern-hide-stars " ")
-  (org-modern-keyword '(("title"       . "title:       ")
-                        ("description" . "description: ")
-                        ("subtitle"    . "subtitle:    ")
-                        ("date"        . "date:        ")
-                        ("author"      . "author:      ")
-                        ("language"    . "language:    ")
+  (org-modern-keyword '(("title"       . "title:      ")
+                        ("description" . "description:")
+                        ("subtitle"    . "subtitle:   ")
+                        ("date"        . "date:       ")
+                        ("author"      . "author:     ")
+                        ("language"    . "language:   ")
                         (t . t)))
   (org-modern-block-fringe nil)
   :config
@@ -751,7 +751,9 @@ Untuk menghindari hal-hal seperti itu, saya merubah tampilan dari beberapa /font
 (custom-set-faces!
   `(org-block :inherit org-block :background ,(face-attribute 'default :background))
   `(org-block-begin-line :inherit shadow :height 0.8)
-  `(org-document-info :inherit doom-font))
+  `(org-meta-line :foreground ,(face-attribute 'shadow :foreground))
+  `(org-document-info :foreground ,(face-attribute 'shadow :foreground))
+  `(org-document-title :height 2.0 :weight bold :foreground ,(face-attribute 'default :foreground)))
 #+end_src
 
 *** Lainnya
@@ -968,7 +970,7 @@ Saya tidak tahu kenapa tecosaur menyebutnya sebagai /prose/, tapi masuk akal jug
 (defun +zen-prose-org-h ()
   "Reformat the current Org buffer appearance for prose."
   (when (eq major-mode 'org-mode)
-    (setq-local visual-fill-column-width 48
+    (setq-local visual-fill-column-width 72
                 org-adapt-indentation nil
                 org-modern-hide-stars t
                 +zen-text-scale 1.0)
@@ -1009,7 +1011,7 @@ Untuk konfigurasi presentasi sendiri saya menyontek dari [[https://youtu.be/SCPo
   :hook ((org-present-mode . +org-present-hook)
          (org-present-mode-quit . +org-present-quit-hook))
   :init
-  (map! :leader :desc "Present" "t p" #'org-present-mode)
+  (map! :leader :desc "Present" "t p" #'org-present)
   (add-hook 'org-present-after-navigate-functions '+org-present-prepare-slide))
 #+end_src
 
