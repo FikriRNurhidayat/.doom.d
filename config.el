@@ -4,19 +4,19 @@
       user-mail-address "fikrirnurhidayat@gmail.com")
 
 (setq doom-font
-      (font-spec :family "Noto Sans Mono" :size 16)
+      (font-spec :family "Iosevka Fixed" :size 20)
 
       doom-big-font
       (font-spec :size 32)
 
       doom-variable-pitch-font
-      (font-spec :family "Noto Serif" :size 16 :weight 'book)
+      (font-spec :family "Iosevka Aile" :size 20 :weight 'normal)
 
       doom-unicode-font
       (font-spec :family "JuliaMono")
 
       doom-serif-font
-      (font-spec :family "Noto Serif" :weight 'book))
+      (font-spec :family "Iosevka Etoile" :weight 'normal))
 
 (custom-set-faces!
   '(font-lock-comment-face :slant italic)
@@ -79,6 +79,8 @@
 
 (load-file (concat doom-user-dir "lisp/org/org-note.el"))
 
+(map! :leader :desc "Present" "t n" #'org-note-mode)
+
 (defun +deft-open-file-hook ()
   (when (eq major-mode 'org-mode)
     (org-note-mode 1)))
@@ -108,10 +110,6 @@
   :config
   (global-org-modern-mode))
 
-;;(use-package! org-modern-indent
-;;  :hook
-;;  (org-indent-mode . org-modern-indent-mode))
-
 (setq org-hide-emphasis-markers t)
 
 (use-package! org-appear
@@ -125,7 +123,8 @@
   (run-at-time nil nil #'org-appear--set-elements))
 
 (custom-set-faces!
-  `(org-block :inherit org-block :background ,(face-attribute 'default :background)))
+  `(org-block :inherit org-block :background ,(face-attribute 'default :background))
+  `(org-block-begin-line :inherit shadow :height 0.8))
 
 (setq org-pretty-entities t
       org-ellipsis "…")
@@ -136,8 +135,10 @@
                                '("INBOX.org" "PROJECTS.org" "NEXT.org" "MAYBE.org")))
 
 (defun +org-agenda-finalize-hook ()
- (dolist (file org-agenda-files)
-  (find-file-noselect file)))
+  "Load org agenda files and hide modeline."
+  (hide-mode-line-mode 1)
+  (dolist (file org-agenda-files)
+    (find-file-noselect file)))
 
 (add-hook 'org-agenda-finalize-hook #'+org-agenda-finalize-hook)
 
@@ -334,3 +335,6 @@
   :init
   (when (and (file-directory-p "~/Works/Repositories") (file-directory-p "~/Repositories"))
     (setq projectile-project-search-path '("~/Work/Repositories" "~/Repositories" "~/Repositories/GO/src"))))
+
+(setq geiser-repl-autodoc-p nil
+      geiser-mode-autodoc-p nil)

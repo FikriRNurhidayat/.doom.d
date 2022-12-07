@@ -291,19 +291,19 @@ Saya suka fon bawaan dari system. Untuk sistem operasi yang pakai adalah Arch Li
 #+name: font
 #+begin_src elisp :tangle ./config.el
 (setq doom-font
-      (font-spec :family "Noto Sans Mono" :size 16)
+      (font-spec :family "Iosevka Fixed" :size 20)
 
       doom-big-font
       (font-spec :size 32)
 
       doom-variable-pitch-font
-      (font-spec :family "Noto Serif" :size 16 :weight 'book)
+      (font-spec :family "Iosevka Aile" :size 20 :weight 'normal)
 
       doom-unicode-font
       (font-spec :family "JuliaMono")
 
       doom-serif-font
-      (font-spec :family "Noto Serif" :weight 'book))
+      (font-spec :family "Iosevka Etoile" :weight 'normal))
 #+end_src
 
 Dan juga saya perlu memodifikasi beberapa simbol yang ditampilkan oleh emacs, karena secara bawaan masih terlihat sedikit aneh bagi mata saya. Kode di bawah ini berfungsi untuk membuat simbol /comment/ dan /keyword/ di dalam emacs ditampilkan dengan huruf miring.
@@ -579,11 +579,13 @@ Saya tidak terlalu suka juga dengan tampilan bawaan ketika saya membuka catatan.
   :lighter "org-note"
   (if org-note-mode
       (progn
-        (setq-local visual-fill-column-width 72
+        (setq-local visual-fill-column-width 96
                     visual-fill-column-center-text t)
-        (visual-fill-column-mode 1))
+        (visual-fill-column-mode 1)
+        (mixed-pitch-mode 1))
     (progn
       (setq-local visual-fill-column-width nil)
+      (mixed-pitch-mode 0)
       (visual-fill-column-mode 0))))
 
 (provide 'org-note)
@@ -594,6 +596,12 @@ Lalu, muat file tersebut ketika membuka doom emacs.
 
 #+begin_src elisp :tangle ./config.el
 (load-file (concat doom-user-dir "lisp/org/org-note.el"))
+#+end_src
+
+Terakhir, saya perlu menambahkan /keybinding/ untuk mengaktifkan mode pencatatan.
+
+#+begin_src elisp :tangle ./config.el
+(map! :leader :desc "Present" "t n" #'org-note-mode)
 #+end_src
 
 ** Otomatis Mengaktifkan Mode Pencatatan
@@ -678,20 +686,6 @@ Dan juga, karena tulisan saya punya tajuk yang semakin menjorok ke dalam, maka d
   (global-org-modern-mode))
 #+end_src
 
-Terakhir, =org-modern= tidak kompatibel dengan =org-indent-mode=, maka dari itu ada paket baru yang perlu saya instal, yaitu =org-modern-indent=.
-
-#+begin_src elisp :tangle ./packages.el
-;;(package! org-modern-indent :recipe (:host github :repo "jdtsmith/org-modern-indent"))
-#+end_src
-
-Lalu, kita aktifkan =org-modern-indent-mode= ketika menyalakan =org-indent-mode=.
-
-#+begin_src elisp :tangle ./config.el
-;;(use-package! org-modern-indent
-;;  :hook
-;;  (org-indent-mode . org-modern-indent-mode))
-#+end_src
-
 *** Emphasis Tidak Terlihat
 
 Saya bisa menambahkan *bold*, /italic/, +strike-through+, dan sebagainya. Secara bawaan, ketika emacs menampilkan file org, di bagian emphasis, emacs akan menampilkan bungkus dari emphasis itu, sebagai contoh =*bold*=. Tampilan seperti itu mengganggu konsentrasi saya, karena terlalu banyak informasi yang ditampilkan secara literal, maka dari itu sebaiknya disembunyikan saja.
@@ -730,7 +724,8 @@ Untuk menghindari hal-hal seperti itu, saya merubah tampilan dari beberapa /font
 
 #+begin_src elisp :tangle ./config.el
 (custom-set-faces!
-  `(org-block :inherit org-block :background ,(face-attribute 'default :background)))
+  `(org-block :inherit org-block :background ,(face-attribute 'default :background))
+  `(org-block-begin-line :inherit shadow :height 0.8))
 #+end_src
 
 *** Lainnya
@@ -764,8 +759,10 @@ Kode dibawah ini saya gunakan untuk mengatur variabel =+org-agenda-directory= da
 
 #+begin_src elisp :tangle ./config.el
 (defun +org-agenda-finalize-hook ()
- (dolist (file org-agenda-files)
-  (find-file-noselect file)))
+  "Load org agenda files and hide modeline."
+  (hide-mode-line-mode 1)
+  (dolist (file org-agenda-files)
+    (find-file-noselect file)))
 
 (add-hook 'org-agenda-finalize-hook #'+org-agenda-finalize-hook)
 #+end_src
@@ -986,7 +983,7 @@ Untuk konfigurasi presentasi sendiri saya menyontek dari [[https://youtu.be/SCPo
   :hook ((org-present-mode . +org-present-hook)
          (org-present-mode-quit . +org-present-quit-hook))
   :init
-  (map! :leader :desc "Present" "t p" #'org-present)
+  (map! :leader :desc "Present" "t p" #'org-present-mode)
   (add-hook 'org-present-after-navigate-functions '+org-present-prepare-slide))
 #+end_src
 
@@ -1326,4 +1323,11 @@ Ripgrep adalah sebuah biner yang berfungsi layaknya /grep/, bedanya /ripgrep/ ja
 
 #+begin_src elisp :tangle ./packages.el
 (package! ripgrep)
+#+end_src
+
+** Guile
+
+#+begin_src elisp :tangle ./config.el
+(setq geiser-repl-autodoc-p nil
+      geiser-mode-autodoc-p nil)
 #+end_src

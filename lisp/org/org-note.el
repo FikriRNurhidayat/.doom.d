@@ -8,11 +8,13 @@
   :lighter "org-note"
   (if org-note-mode
       (progn
-        (setq-local visual-fill-column-width 72
+        (setq-local visual-fill-column-width 96
                     visual-fill-column-center-text t)
-        (visual-fill-column-mode 1))
+        (visual-fill-column-mode 1)
+        (mixed-pitch-mode 1))
     (progn
       (setq-local visual-fill-column-width nil)
+      (mixed-pitch-mode 0)
       (visual-fill-column-mode 0))))
 
 (provide 'org-note)
