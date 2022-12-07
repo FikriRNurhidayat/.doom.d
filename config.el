@@ -79,7 +79,7 @@
 
 (load-file (concat doom-user-dir "lisp/org/org-note.el"))
 
-(map! :leader :desc "Present" "t n" #'org-note-mode)
+(map! :leader :desc "Note" "t n" #'org-note-mode)
 
 (defun +deft-open-file-hook ()
   (when (eq major-mode 'org-mode)
@@ -255,7 +255,7 @@
   (save-excursion
     ;; hide org-mode options starting with #+
     (goto-char (point-min))
-    (while (re-search-forward "^[[:space:]]*\\(#\\+\\)\\([^[:space:]]+\\)[:space:]." nil t)
+    (while (re-search-forward "^[[:space:]]*\\(#\\\+\\)\\([a-zA-Z]+\\(?:_[a-zA-Z]+\\)*\\)\\(\\\:[[:space:]]\\|[[:space:]].*\\)" nil t)
       (let ((end (if (org-present-show-option (match-string 2)) 2 0)))
         (org-present-add-overlay (match-beginning 1) (match-end end))))
     ;; hide stars in headings
