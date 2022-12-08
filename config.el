@@ -256,7 +256,7 @@
     (save-excursion
       ;; hide org-mode options starting with #+
       (goto-char (point-min))
-      (while (re-search-forward "^[[:space:]]*\\(#\\\+\\)\\([a-zA-Z]+\\(?:_[a-zA-Z]+\\)*\\)\\(\\\:[[:space:]]\\|[[:space:]].*\\)" nil t)
+      (while (re-search-forward "^[[:space:]]*\\(#\\\+\\)\\(\\(\\(title\\|subtitle\\|date\\|author\\|email\\)\\\:[[:space:]]\\)\\|\\([a-zA-Z]+\\(?:_[a-zA-Z]+\\).*\\)\\)" nil t)
         (let ((end (if (org-present-show-option (match-string 2)) 2 0)))
           (org-present-add-overlay (match-beginning 1) (match-end end))))
       ;; hide stars in headings
