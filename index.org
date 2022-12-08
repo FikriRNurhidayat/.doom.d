@@ -335,7 +335,7 @@ Karena sistem saya mayoritas menggunakan [[https://www.nordtheme.com/][nord]], s
 
 #+name: emacs-theme
 #+begin_src elisp :tangle ./config.el
-(setq doom-theme 'doom-nord-aurora)
+(setq doom-theme 'doom-nord-light)
 #+end_src
 
 *** Window
@@ -364,7 +364,7 @@ Dan juga, karena saya begitu mudah terdistraksi dengan pesan yang muncul di dala
 
 #+name: emacs-echo-area
 #+begin_src elisp :tangle ./config.el
-(setq inhibit-message t
+(setq inhibit-message nil
       echo-keystores nil
       message-log-max 100)
 #+end_src
@@ -636,6 +636,13 @@ Mode tersebut akan diaktifkan ketika kita membuka catatan melalui deft.
 
 Org adalah sebuah mode di dalam emacs yang berfungsi untuk menerapkan /"Carsten's outline-mode for keeping track of everything."/. Di dalam emacs, banyak sekali fitur yang dapat digunakan ketika kita menggunakan =org-mode=. Salah satunya adalah manajemen tugas. Namun pada bagian ini saya hanya akan berfokus kepada kegunaan emacs dalam proses menulis saja.
 
+** Keybindings
+
+#+begin_src elisp :tangle ./config.el
+(after! org
+  (map! :leader :desc "Execute ORG Babel Block" "m E" #'org-babel-execute-src-block))
+#+end_src
+
 ** /File/ dan Direktori
 
 Saya bisa memberi tahu emacs, dimana saya akan menyimpan file org saya di dalam komputer saya. Ini sebenarnya tidak terlalu penting, karena pada umumnya, saya hanya perlu memspesifikasikan lokasi file di dalam konfigurasi fitur org yang akan saya gunakan, seperti org agenda, dan org roam.
@@ -703,6 +710,7 @@ Dan juga, karena tulisan saya punya tajuk yang semakin menjorok ke dalam, maka d
                         ("description" . "description:")
                         ("subtitle"    . "subtitle:   ")
                         ("date"        . "date:       ")
+                        ("email"       . "email:      ")
                         ("author"      . "author:     ")
                         ("language"    . "language:   ")
                         ("options"     . "options:    ")
@@ -1026,7 +1034,7 @@ Untuk konfigurasi presentasi sendiri saya menyontek dari [[https://youtu.be/SCPo
 *** Perbaikan
 
 #+begin_src elisp :tangle ./config.el
-(after!
+(after! org-present
   (defun org-present-add-overlays ()
     "Add overlays for this mode."
     (add-to-invisibility-spec '(org-present))
@@ -1088,6 +1096,7 @@ Masih ada beberapa hal yang perlu saya sesuaikan disini, sebagai contoh, saya pe
                                           ("subtitle"    . "")
                                           ("date"        . "")
                                           ("author"      . "")
+                                          ("email"       . "")
                                           ("language"    . "")
                                           ("options"     . "")
                                           (t . t)))

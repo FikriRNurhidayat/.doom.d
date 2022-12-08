@@ -25,7 +25,7 @@
 
 (setq display-line-numbers-type 'relative)
 
-(setq doom-theme 'doom-nord-aurora)
+(setq doom-theme 'doom-nord-light)
 
 (defun +doom-remove-annoying-visual ()
   "Remove border, fringe, and so on."
@@ -38,7 +38,7 @@
 ;; TODO: Find what hook should we attach so this will always be properly executed
 (add-to-list 'doom-load-theme-hook '+doom-remove-annoying-visual)
 
-(setq inhibit-message t
+(setq inhibit-message nil
       echo-keystores nil
       message-log-max 100)
 
@@ -85,6 +85,9 @@
   (when (eq major-mode 'org-mode)
     (org-note-mode 1)))
 
+(after! org
+  (map! :leader :desc "Execute ORG Babel Block" "m E" #'org-babel-execute-src-block))
+
 (setq org-directory "/home/fain/Documents/org/")
 
 (setq org-clock-sound "/home/fain/Documents/bababooey.wav")
@@ -110,6 +113,7 @@
                         ("description" . "description:")
                         ("subtitle"    . "subtitle:   ")
                         ("date"        . "date:       ")
+                        ("email"       . "email:      ")
                         ("author"      . "author:     ")
                         ("language"    . "language:   ")
                         ("options"     . "options:    ")
@@ -249,7 +253,7 @@
   (map! :leader :desc "Present" "t p" #'+org-present-mode)
   (add-hook 'org-present-after-navigate-functions '+org-present-prepare-slide))
 
-(after!
+(after! org-present
   (defun org-present-add-overlays ()
     "Add overlays for this mode."
     (add-to-invisibility-spec '(org-present))
@@ -299,6 +303,7 @@
                                           ("subtitle"    . "")
                                           ("date"        . "")
                                           ("author"      . "")
+                                          ("email"       . "")
                                           ("language"    . "")
                                           ("options"     . "")
                                           (t . t)))
