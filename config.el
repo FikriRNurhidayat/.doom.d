@@ -249,36 +249,37 @@
   (map! :leader :desc "Present" "t p" #'+org-present-mode)
   (add-hook 'org-present-after-navigate-functions '+org-present-prepare-slide))
 
-(defun org-present-add-overlays ()
-  "Add overlays for this mode."
-  (add-to-invisibility-spec '(org-present))
-  (save-excursion
-    ;; hide org-mode options starting with #+
-    (goto-char (point-min))
-    (while (re-search-forward "^[[:space:]]*\\(#\\\+\\)\\([a-zA-Z]+\\(?:_[a-zA-Z]+\\)*\\)\\(\\\:[[:space:]]\\|[[:space:]].*\\)" nil t)
-      (let ((end (if (org-present-show-option (match-string 2)) 2 0)))
-        (org-present-add-overlay (match-beginning 1) (match-end end))))
-    ;; hide stars in headings
-    (if org-present-hide-stars-in-headings
-        (progn (goto-char (point-min))
-               (while (re-search-forward "^\\(*+\\)" nil t)
-                 (org-present-add-overlay (match-beginning 1) (match-end 1)))))
-    ;; hide emphasis/verbatim markers if not already hidden by org
-    (if org-hide-emphasis-markers nil
-      ;; TODO https://github.com/rlister/org-present/issues/12
-      ;; It would be better to reuse org's own facility for this, if possible.
-      ;; However it is not obvious how to do this.
-      (progn
-        ;; hide emphasis markers
-        (goto-char (point-min))
-        (while (re-search-forward org-emph-re nil t)
-          (org-present-add-overlay (match-beginning 2) (1+ (match-beginning 2)))
-          (org-present-add-overlay (1- (match-end 2)) (match-end 2)))
-        ;; hide verbatim markers
-        (goto-char (point-min))
-        (while (re-search-forward org-verbatim-re nil t)
-          (org-present-add-overlay (match-beginning 2) (1+ (match-beginning 2)))
-          (org-present-add-overlay (1- (match-end 2)) (match-end 2)))))))
+(after!
+  (defun org-present-add-overlays ()
+    "Add overlays for this mode."
+    (add-to-invisibility-spec '(org-present))
+    (save-excursion
+      ;; hide org-mode options starting with #+
+      (goto-char (point-min))
+      (while (re-search-forward "^[[:space:]]*\\(#\\\+\\)\\([a-zA-Z]+\\(?:_[a-zA-Z]+\\)*\\)\\(\\\:[[:space:]]\\|[[:space:]].*\\)" nil t)
+        (let ((end (if (org-present-show-option (match-string 2)) 2 0)))
+          (org-present-add-overlay (match-beginning 1) (match-end end))))
+      ;; hide stars in headings
+      (if org-present-hide-stars-in-headings
+          (progn (goto-char (point-min))
+                 (while (re-search-forward "^\\(*+\\)" nil t)
+                   (org-present-add-overlay (match-beginning 1) (match-end 1)))))
+      ;; hide emphasis/verbatim markers if not already hidden by org
+      (if org-hide-emphasis-markers nil
+        ;; TODO https://github.com/rlister/org-present/issues/12
+        ;; It would be better to reuse org's own facility for this, if possible.
+        ;; However it is not obvious how to do this.
+        (progn
+          ;; hide emphasis markers
+          (goto-char (point-min))
+          (while (re-search-forward org-emph-re nil t)
+            (org-present-add-overlay (match-beginning 2) (1+ (match-beginning 2)))
+            (org-present-add-overlay (1- (match-end 2)) (match-end 2)))
+          ;; hide verbatim markers
+          (goto-char (point-min))
+          (while (re-search-forward org-verbatim-re nil t)
+            (org-present-add-overlay (match-beginning 2) (1+ (match-beginning 2)))
+            (org-present-add-overlay (1- (match-end 2)) (match-end 2))))))))
 
 (defvar +org-present-org-level-scale '((org-level-1 . 2.0)
                                        (org-level-2 . 1.75)
