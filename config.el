@@ -25,7 +25,7 @@
 
 (setq display-line-numbers-type 'relative)
 
-(setq doom-theme 'doom-nord-light)
+(setq doom-theme 'doom-nord)
 
 (defun +doom-remove-annoying-visual ()
   "Remove border, fringe, and so on."
@@ -39,7 +39,7 @@
 (add-to-list 'doom-load-theme-hook '+doom-remove-annoying-visual)
 
 (setq inhibit-message nil
-      echo-keystores nil
+      echo-keystrokes nil
       message-log-max 100)
 
 (use-package! doom-modeline
@@ -116,7 +116,10 @@
                         ("email"       . "email:      ")
                         ("author"      . "author:     ")
                         ("language"    . "language:   ")
+                        ("filetags"    . "filetags:   ")
                         ("options"     . "options:    ")
+                        ("name"        . "name:       ")
+                        ("attr_html"   . "attr_html:  ")
                         (t . t)))
   (org-modern-block-fringe nil)
   :config
@@ -139,7 +142,7 @@
   `(org-block-begin-line :inherit shadow :height 0.8)
   `(org-meta-line :foreground ,(face-attribute 'shadow :foreground))
   `(org-document-info :foreground ,(face-attribute 'shadow :foreground))
-  `(org-document-title :height 2.0 :weight bold :foreground ,(face-attribute 'default :foreground)))
+  `(org-document-title :weight bold :foreground ,(face-attribute 'default :foreground)))
 
 (setq org-pretty-entities t
       org-ellipsis "…")
@@ -247,11 +250,20 @@
     (org-present-quit)))
 
 (use-package! org-present
-  :hook ((org-present-mode . +org-present-hook)
-         (org-present-mode-quit . +org-present-quit-hook))
-  :init
+  :hook ((org-present-mode . +org-present-enable-hook)
+         (org-present-mode-quit . +org-present-disable-hook))
+  :bind (:map org-present-mode-keymap
+              ("C-z" . org-present))
+  :config
+  (add-hook 'org-present-after-navigate-function '+org-present-prepare-slide)
   (map! :leader :desc "Present" "t p" #'+org-present-mode)
-  (add-hook 'org-present-after-navigate-functions '+org-present-prepare-slide))
+  (map! :after org-present
+        :map org-present-mode-keymap
+        :desc "Focus on current heading." :n "C-z" #'org-present
+        :desc "Display blocks" :n "C-b" #'org-show-block-all
+        :desc "Go to parent slide." :n "C-t" #'+org-present-up
+        :desc "Go to next slide." :n "C-l" #'+org-present-next-sibling
+        :desc "Go to previous slide." :n "C-h" #'+org-present-previous-sibling))
 
 (after! org-present
   (defun org-present-add-overlays ()
@@ -285,9 +297,42 @@
             (org-present-add-overlay (match-beginning 2) (1+ (match-beginning 2)))
             (org-present-add-overlay (1- (match-end 2)) (match-end 2))))))))
 
+(defun +org-present-up ()
+  "Go to higher heading from current heading."
+  (interactive)
+  (widen)
+  (org-up-heading-safe)
+  (org-present-narrow)
+  (org-present-run-after-navigate-functions))
+
+(defun +org-present-next-sibling ()
+  "Go to next sibling."
+  (interactive)
+  (widen)
+  (unless (org-goto-first-child)
+    (org-get-next-sibling))
+  (org-present-narrow)
+  (org-present-run-after-navigate-functions))
+
+(defun +org-present--last-child ()
+  "Find last child of current heading."
+  (when (org-goto-sibling) (+org-present--last-child))
+  (when (org-goto-first-child) (+org-present--last-child)))
+
+(defun +org-present-previous-sibling ()
+  "Go to next sibling."
+  (interactive)
+  (widen)
+  ;; TODO: Handle if previous sibling is parent
+  (org-get-previous-sibling)
+  (when (org-goto-first-child)
+    (+org-present--last-child))
+  (org-present-narrow)
+  (org-present-run-after-navigate-functions))
+
 (defvar +org-present-org-level-scale '((org-level-1 . 2.0)
-                                       (org-level-2 . 1.75)
-                                       (org-level-3 . 1.5)
+                                       (org-level-2 . 1.25)
+                                       (org-level-3 . 1.25)
                                        (org-level-4 . 1.25)
                                        (org-level-5 . 1.25)
                                        (org-level-6 . 1.25)
@@ -298,6 +343,8 @@
 (defvar +org-present-original-org-modern-hide-stars nil)
 (defvar +org-present-original-org-indent-mode nil)
 (defvar +org-present-original-org-modern-keyword nil)
+(defvar +org-present-original-inhibit-message nil)
+(defvar +org-present-original-echo-keystrokes nil)
 (defvar +org-present-org-modern-keyword '(("title"       . "")
                                           ("description" . "")
                                           ("subtitle"    . "")
@@ -308,20 +355,24 @@
                                           ("options"     . "")
                                           (t . t)))
 
-(defun +org-present-hook ()
+(defun +org-present-enable-hook ()
   (setq-local +org-present-original-org-modern-hide-stars org-modern-hide-stars
               +org-present-original-org-indent-mode org-indent-mode
-              +org-present-original-org-modern-keyword org-modern-keyword)
+              +org-present-original-org-modern-keyword org-modern-keyword
+              +org-present-original-inhibit-message inhibit-message
+              +org-present-original-echo-keystrokes echo-keystrokes)
   (org-modern-mode 0)
   (org-indent-mode 0)
   (setq-local visual-fill-column-width 128
               visual-fill-column-center-text t
               org-modern-hide-stars t
+              inhibit-message t
+              echo-keystrokes nil
               header-line-format " "
               org-modern-keyword +org-present-org-modern-keyword)
   (setq-local face-remapping-alist (append (mapcar (lambda (face) `(,(car face) (:height ,(cdr face))  ,(car face))) +org-present-org-level-scale)
                                            '((default (:height 1.25) default)
-                                             (header-line (:height 8.0) header-line)
+                                             (header-line (:height 4.0) header-line)
                                              (org-document-title (:height 2.0) org-document-title)
                                              (org-document-info (:height 1.0) org-document-info))))
   (display-line-numbers-mode 0)
@@ -336,15 +387,18 @@
 (defun +org-present-prepare-slide (buffer-name heading)
   (org-overview)
   (org-fold-show-entry)
-  (org-fold-show-children))
+  (org-hide-block-all)
+  (org-hide-drawer-all))
 
-(defun +org-present-quit-hook ()
+(defun +org-present-disable-hook ()
   (setq-local header-line-format nil
               face-remapping-alist nil
               org-adapt-indentation nil
               org-modern-hide-stars +org-present-original-org-modern-hide-stars
               org-indent-mode +org-present-original-org-indent-mode
-              org-modern-keyword +org-present-original-org-modern-keyword)
+              org-modern-keyword +org-present-original-org-modern-keyword
+              inhibit-message +org-present-original-inhibit-message
+              echo-keystrokes +org-present-original-echo-keystrokes)
   (org-present-small)
   (visual-fill-column-mode 0)
   (org-indent-mode 1)
