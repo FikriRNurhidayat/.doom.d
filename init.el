@@ -77,7 +77,6 @@
        (org                    ; organize your plain life in plain text
        +roam2                  ; whoa a second brain?
        +appear                 ; reduce the unnecessary text
-       +present                ; present like a chad
        +babel                  ; babel
        +gnuplot                ; gnuplot
        +cliplink)              ; nuclear code

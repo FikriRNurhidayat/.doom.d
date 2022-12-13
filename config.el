@@ -252,27 +252,27 @@
 (use-package! org-present
   :hook ((org-present-mode . +org-present-enable-hook)
          (org-present-mode-quit . +org-present-disable-hook))
-  :bind (:map org-present-mode-keymap
-              ("C-z" . org-present))
-  :config
-  (add-hook 'org-present-after-navigate-function '+org-present-prepare-slide)
+  :init
+  (add-hook 'org-present-after-navigate-functions '+org-present-prepare-slide)
   (map! :leader :desc "Present" "t p" #'+org-present-mode)
   (map! :after org-present
         :map org-present-mode-keymap
-        :desc "Focus on current heading." :n "C-z" #'org-present
-        :desc "Display blocks" :n "C-b" #'org-show-block-all
-        :desc "Go to parent slide." :n "C-t" #'+org-present-up
+        :desc "Focus on current heading." :n "z z" #'org-present
+        :desc "Display blocks" :n "z b" (defun +org-show-block () (org-fold-show-all 'block))
+        :desc "Go to heading" :n "z h" (defun +org-back-to-heading () (interactive) (org-back-to-heading))
+        :desc "Go to parent slide." :n "z t" #'+org-present-up
         :desc "Go to next slide." :n "C-l" #'+org-present-next-sibling
         :desc "Go to previous slide." :n "C-h" #'+org-present-previous-sibling))
 
 (after! org-present
+  (setq org-present-add-overlays-regex "^[[:space:]]*\\(#\\\+\\)\\(\\(\\(title\\|subtitle\\|date\\|author\\|email\\)\\\:[[:space:]]\\)\\|\\(\\([a-zA-Z]+\\(?:_[a-zA-Z]+\\)*\\).*\\)\\)")
   (defun org-present-add-overlays ()
     "Add overlays for this mode."
     (add-to-invisibility-spec '(org-present))
     (save-excursion
       ;; hide org-mode options starting with #+
       (goto-char (point-min))
-      (while (re-search-forward "^[[:space:]]*\\(#\\\+\\)\\(\\(\\(title\\|subtitle\\|date\\|author\\|email\\)\\\:[[:space:]]\\)\\|\\([a-zA-Z]+\\(?:_[a-zA-Z]+\\).*\\)\\)" nil t)
+      (while (re-search-forward org-present-add-overlays-regex nil t)
         (let ((end (if (org-present-show-option (match-string 2)) 2 0)))
           (org-present-add-overlay (match-beginning 1) (match-end end))))
       ;; hide stars in headings
@@ -323,10 +323,12 @@
   "Go to next sibling."
   (interactive)
   (widen)
-  ;; TODO: Handle if previous sibling is parent
-  (org-get-previous-sibling)
-  (when (org-goto-first-child)
-    (+org-present--last-child))
+  (when (org-current-level)
+    (message "KONTOL")
+    (org-back-to-heading)
+    (if (and (org-get-previous-sibling) (org-current-level))
+        (when (org-goto-first-child)
+          (+org-present--last-child))))
   (org-present-narrow)
   (org-present-run-after-navigate-functions))
 
@@ -387,8 +389,8 @@
 (defun +org-present-prepare-slide (buffer-name heading)
   (org-overview)
   (org-fold-show-entry)
-  (org-hide-block-all)
-  (org-hide-drawer-all))
+  (org-fold-hide-block-all)
+  (org-fold-hide-drawer-all))
 
 (defun +org-present-disable-hook ()
   (setq-local header-line-format nil
