@@ -1179,7 +1179,7 @@ Masih ada beberapa hal yang perlu saya sesuaikan disini, sebagai contoh, saya pe
               org-modern-keyword +org-present-org-modern-keyword)
   (setq-local face-remapping-alist (append (mapcar (lambda (face) `(,(car face) (:height ,(cdr face))  ,(car face))) +org-present-org-level-scale)
                                            '((default (:height 1.25) default)
-                                             (header-line (:height 4.0) header-line)
+                                             (header-line (:height 8.0) header-line)
                                              (org-document-title (:height 2.0) org-document-title)
                                              (org-document-info (:height 1.0) org-document-info))))
   (display-line-numbers-mode 0)
