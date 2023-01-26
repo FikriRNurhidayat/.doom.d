@@ -15,7 +15,7 @@
        doom                    ; what makes DOOM look the way it does
        doom-dashboard          ; nifty dashboard
        hl-todo                 ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
-       (ligatures +extra)      ; ligatures and symbols to make your code pretty again
+       (ligatures +iosevka)    ; ligatures and symbols to make your code pretty again
        modeline                ; snazzy, Atom-inspired modeline, plus API
        ophints                 ; highlight the region an operation acts on
        (popup +defaults)       ; tame sudden yet inevitable temporary windows
@@ -58,15 +58,15 @@
        ;;tty                  ; improve the terminal Emacs experience
 
        :lang
-       (cc +eglot)               ; C > C++ == 1
+       (cc +lsp)               ; C > C++ == 1
        clojure                 ; java with a lisp
        common-lisp             ; if you've seen one lisp, you've seen them all
        data                    ; config/data formats
-       (dart +flutter +eglot)    ; paint ui and not much else
+       (dart +flutter +lsp)  ; paint ui and not much else
        emacs-lisp              ; drown in parentheses
-       (go +eglot)               ; the hipster dialect
+       (go +lsp)             ; the hipster dialect
        json                    ; At least it ain't XML
-       (java +eglot)             ; the poster child for carpal tunnel syndrome
+       (java +lsp)           ; the poster child for carpal tunnel syndrome
        javascript              ; all(hope(abandon(ye(who(enter(here))))))
        julia                   ; a better, faster MATLAB
        kotlin                  ; a better, slicker Java(Script)
@@ -83,7 +83,7 @@
        racket                  ; a DSL for DSLs
        rest                    ; Emacs as a REST client
        (ruby +rails)           ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
-       (rust +eglot)           ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+       (rust +lsp)           ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        (scheme +guile)         ; a fully conniving family of lisps
        sh                      ; she sells {ba,z,fi}sh shells on the C xor
        yaml                    ; JSON, but readable

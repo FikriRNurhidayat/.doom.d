@@ -47,6 +47,7 @@
   (setq doom-modeline-hud nil
         doom-modeline-icon t
         doom-modeline-window-width-limit nil
+        doom-modeline-height 48
         doom-modeline-major-mode-icon nil
         doom-modeline-number-limit 99
         doom-modeline-lsp nil))
@@ -249,6 +250,16 @@
       (org-present)
     (org-present-quit)))
 
+;; TODO: Move this
+(defun +org-show-block ()
+  (interactive)
+  (org-fold-show-all '(blocks)))
+
+;; TODO: Move this
+(defun +org-back-to-heading ()
+  (interactive)
+  (org-back-to-heading))
+
 (use-package! org-present
   :hook ((org-present-mode . +org-present-enable-hook)
          (org-present-mode-quit . +org-present-disable-hook))
@@ -258,8 +269,8 @@
   (map! :after org-present
         :map org-present-mode-keymap
         :desc "Focus on current heading." :n "z z" #'org-present
-        :desc "Display blocks" :n "z b" (defun +org-show-block () (org-fold-show-all 'block))
-        :desc "Go to heading" :n "z h" (defun +org-back-to-heading () (interactive) (org-back-to-heading))
+        :desc "Display blocks" :n "C-b" #'+org-show-block
+        :desc "Go to heading" :n "z h" #'+org-back-to-heading
         :desc "Go to parent slide." :n "z t" #'+org-present-up
         :desc "Go to next slide." :n "C-l" #'+org-present-next-sibling
         :desc "Go to previous slide." :n "C-h" #'+org-present-previous-sibling))
@@ -453,7 +464,18 @@
 
 (appendq! org-export-backends '(gfm))
 
-(setq +ligatures-extra-alist nil)
+(defvar +ligatures-extra-symbols
+  '(:name          "»"
+    :src_block     "»"
+    :src_block_end "«"
+    :quote         "“"
+    :quote_end     "”"
+    :lambda        "λ")
+  "Maps identifiers to symbols, recognized by `set-ligatures'.
+
+This should not contain any symbols from the Unicode Private Area! There is no
+universal way of getting the correct symbol as that area varies from font to
+font.")
 
 (load-file (concat doom-user-dir "lisp/eshell/eshell.el"))
 
