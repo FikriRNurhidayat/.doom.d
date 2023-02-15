@@ -4,13 +4,13 @@
       user-mail-address "fikrirnurhidayat@gmail.com")
 
 (setq doom-font
-      (font-spec :family "Iosevka Fixed" :size 20)
+      (font-spec :family "Iosevka Fixed" :size 16)
 
       doom-big-font
       (font-spec :size 32)
 
       doom-variable-pitch-font
-      (font-spec :family "Iosevka Aile" :size 20 :weight 'normal)
+      (font-spec :family "Iosevka Aile" :size 16 :weight 'normal)
 
       doom-unicode-font
       (font-spec :family "JuliaMono")
